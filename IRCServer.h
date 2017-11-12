@@ -46,4 +46,16 @@ struct UserList{
 };
 
 typedef struct UserList UserList;
+
+void initUserList(UserList *list);
+void printUserList(UserList *list);
+void addUser(UserList *list, char *username, char *password, int writeFile);
+int userExists(UserList *list, char *username);
+int removeUser(UserList *list, char *username);
+int numOfUsers(UserList *list);
+int saveUserList(UserList *list, char *file_name);
+int readUserList(UserList *list, char *file_name);
+void clearUsers(UserList *list);
+void sortUserList(UserList *list);
+
 #endif
