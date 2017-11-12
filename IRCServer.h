@@ -24,4 +24,12 @@ public:
 	void runServer(int port);
 };
 
+//data structure to store messages
+struct msgArray{
+	char *message;
+	char *username;
+}
+
+typedef struct MessageContainer MessageContainer;
+
 #endif
