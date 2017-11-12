@@ -36,6 +36,28 @@ int QueueLength = 5;
 
 //test
 
+void initUserList(UserList *list){
+	list -> head = NULL;
+}
+
+void printUserList(UserList *list){
+	UserNode *n;
+	
+	if(list -> head == NULL){
+		printf("{EMPTY}\n");
+		return;
+	}
+	printf("{");
+	n = list -> head;
+	while(n != NULL){
+		printf("%d", n -> value);
+		n = n -> next;
+		if(n != NULL){
+			printf(", ");
+		}
+	}
+	printf("}\n");
+}
 int
 IRCServer::open_server_socket(int port) {
 
