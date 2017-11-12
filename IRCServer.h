@@ -32,6 +32,7 @@ struct MessageArray{
 
 typedef struct MessageArray MessageArray;
 
+//data structure for list of users
 struct UserNode{
 	int value;
 	char *username;
@@ -57,5 +58,23 @@ int saveUserList(UserList *list, char *file_name);
 int readUserList(UserList *list, char *file_name);
 void clearUsers(UserList *list);
 void sortUserList(UserList *list);
+
+//data structure for list of rooms
+struct RoomNode{
+	char *name;
+	int messageCounter;
+	MessageArray m[100];
+	UserList *capacity;
+	struct RoomNode *next;
+};
+
+typedef struct RoomNode RoomNode;
+
+struct RoomList{
+	RoomNode *head;
+};
+
+typedef struct RoomList RoomList;
+
 
 #endif
