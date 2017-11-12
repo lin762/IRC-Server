@@ -25,11 +25,25 @@ public:
 };
 
 //data structure to store messages
-struct msgArray{
+struct MessageArray{
 	char *message;
 	char *username;
 }
 
-typedef struct msgArray msgArray;
+typedef struct MessageArray MessageArray;
 
+struct UserNode{
+	int value;
+	char *username;
+	char *password;
+	struct UserNode *next;
+}
+
+typedef struct UserNode UserNode;
+
+struct UserList{
+	UserNode *head;
+}
+
+typedef struct UserList UserList;
 #endif
