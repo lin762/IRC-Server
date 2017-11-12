@@ -30,6 +30,6 @@ struct msgArray{
 	char *username;
 }
 
-typedef struct MessageContainer MessageContainer;
+typedef struct msgArray msgArray;
 
 #endif
