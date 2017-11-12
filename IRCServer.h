@@ -28,7 +28,7 @@ public:
 struct MessageArray{
 	char *message;
 	char *username;
-}
+};
 
 typedef struct MessageArray MessageArray;
 
@@ -37,13 +37,13 @@ struct UserNode{
 	char *username;
 	char *password;
 	struct UserNode *next;
-}
+};
 
 typedef struct UserNode UserNode;
 
 struct UserList{
 	UserNode *head;
-}
+};
 
 typedef struct UserList UserList;
 #endif
