@@ -52,7 +52,7 @@ void initUserList(UserList *list);
 void printUserList(UserList *list);
 void addUser(UserList *list, char *username, char *password, int writeFile);
 int userExists(UserList *list, char *username);
-int removeUser(UserList *list, char *username);
+int userRemove(UserList *list, char *username);
 int numOfUsers(UserList *list);
 int saveUserList(UserList *list, char *file_name);
 int readUserList(UserList *list, char *file_name);
@@ -76,5 +76,11 @@ struct RoomList{
 
 typedef struct RoomList RoomList;
 
-
+void initRoomList(RoomList *list);
+void printRoomList(RoomList *list);
+void addRoom(RoomList *list, char *name);
+RoomNode *getIthRoom(RoomList *list, int i);
+int roomExists(RoomList *list, char *name);
+int roomRemove(RoomList *list, char *name);
+void clearRoom(RoomList *list);
 #endif
