@@ -169,13 +169,16 @@ void sortUserList(UserList *list){
 				b -> value = temp;	
 				
 				tempUsername = strdup(a -> username);
-				a -> username = b -> username;
-				b -> username = tempUsername;
+				a -> username = strdup(b -> username);
+				b -> username = strdup(tempUsername);
 					
 				tempPassword = strdup(a -> password);
-				a -> password = b -> password;
-				b -> password = tempPassword;
-	
+				a -> password = strdup(b -> password);
+				b -> password = strdup(tempPassword);
+				
+				a = b -> next;
+				flag = 1;
+				break;
 }
 
 
