@@ -439,6 +439,10 @@ IRCServer::processRequest( int fd )
 	close(fd);	
 }
 
+UserList *userList;
+RoomList *roomList;
+int maxMessages = 100;
+
 void
 IRCServer::initialize()
 {
