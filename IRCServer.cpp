@@ -80,6 +80,24 @@ void addUser(UserList *list, char *username, char *password, int writeFile){
 //	sortUserList(list);
 }
 
+int userExists(UserList *list, char *username){
+}
+
+int userRemove(UserList *list, char *username){
+}
+
+int numOfUsers(UserList *list){
+}
+
+int saveUserList(UserList *list, char *file_name){
+}
+
+int readUserList(UserList *list, char *file_name){
+}
+
+void clearUsers(UserList *list){
+}
+
 void sortUserList(UserList *list){
 }
 
