@@ -148,6 +148,24 @@ void clearUsers(UserList *list){
 }
 
 void sortUserList(UserList *list){
+	UserNode *a;
+	UserNode *b;
+	a = list -> head;
+	b = a -> next;
+	int flag = 1;
+	int temp;
+	
+	while(flag == 1){
+		flag = 0;
+		a = list -> head;
+		b = a -> next;
+		while(b != NULL){
+			if(strcmp(a -> username, b -> username) > 0){
+				char *tempUsername;
+				char *tempPassword;
+				
+				temp = a -> value;
+				
 }
 
 
