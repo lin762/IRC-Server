@@ -69,11 +69,19 @@ void addUser(UserList *list, char *username, char *password, int writeFile){
 	if(writeFile){
 		FILE *fd;
 		fd = fopen("password.txt", "w");
-		fprintf(fd, "%s %s\n", n -> username, n -> password);
+		UserNode *temp;
+		temp = list -> head;
+		while(temp != NULL){
+			fprintf(fd, "%s %s\n", temp -> username, temp -> password);
+			temp = temp -> next;
+		}
 		fclose(fd);
 	}
 //	sortUserList(list);
 }
+
+void sortUserList(UserList *list){
+	
 
 
 	
