@@ -179,6 +179,12 @@ void sortUserList(UserList *list){
 				a = b -> next;
 				flag = 1;
 				break;
+			}else{
+				a = b;
+				b = b -> next;
+			}
+		}
+	}
 }
 
 
