@@ -459,7 +459,7 @@ IRCServer::initialize()
 		return;
 	}
 	while(fscanf(fd, "%s %s\n", fileuser, filepassword) == 2){
-		addUser(userList, fileuser, filepassword,1);
+		addUserList(userList, fileuser, filepassword,1);
 	}
 	fclose(fd);
 
