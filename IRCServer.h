@@ -63,7 +63,7 @@ struct RoomNode{
 	char *name;
 	int messageCounter;
 	MessageArray m[100];
-	UserList *capacity;
+	UserList *users;
 	struct RoomNode *next;
 };
 

@@ -188,7 +188,34 @@ void sortUserList(UserList *list){
 }
 
 
+void initRoomList(RoomList *list){
+	list -> head = NULL;
+}
+
+void addRoom(RoomList  *list, char *name){
+	RoomNode *n = (RoomNode*)malloc(sizeof(RoomNode));
+	UserList *userList = (UserList*)malloc(sizeof(UserList));
+	initUserList(userList);
+	n -> messageCounter = 0;
+	n -> name = name;
+	n -> users = userList;
 	
+	n -> next = list -> head;
+	list -> head = n;
+	
+}
+
+RoomNode *getIthRoom(RoomList *list, int i){
+}
+
+int roomExists(RoomList *list, char *name){
+}
+
+int roomRemove(RoomList *list, char *name){
+}
+
+void clearRoom(RoomList *list){
+}	
 int
 IRCServer::open_server_socket(int port) {
 
