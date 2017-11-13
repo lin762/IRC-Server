@@ -58,6 +58,23 @@ void printUserList(UserList *list){
 	}
 	printf("}\n");
 }
+
+void addUser(UserList *list, char *username, char *password, int writeFile){
+	UserNode *n = (UserNode *)malloc(sizeof(UserNode));
+	n -> username = strdup(username);
+	n -> password = strdup(password);
+	n -> next = list -> head;
+	list -> head = n;
+	
+	if(writeFile){
+		FILE *fd;
+		fd = fopen("password.txt", "w");
+		fprintf(fd, "%s %s\n", n -> username, n -> password);
+		fclose(fd);
+	}
+	sortUserList(list);
+}
+	
 int
 IRCServer::open_server_socket(int port) {
 
