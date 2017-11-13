@@ -468,6 +468,19 @@ IRCServer::initialize()
 bool
 IRCServer::checkPassword(int fd, const char * user, const char * password) {
 	// Here check the password
+	UserNode *n;
+	n = userList -> head;
+	
+	while(n != NULL){
+		if(strcmp(n -> username, user) == 0){
+			if(strcmp(n -> password, password) == 0){
+				return true;
+			}else{
+				return false;
+			}
+		}
+		n = n -> next;
+	}
 	return true;
 }
 
@@ -475,10 +488,14 @@ void
 IRCServer::addUser(int fd, const char * user, const char * password, const char * args)
 {
 	// Here add a new user. For now always return OK.
-
-	const char * msg =  "OK\r\n";
-	write(fd, msg, strlen(msg));
-
+	if(userExists(userList,user) == 1){
+		addUserList(userList, user, password, 1);
+		const char * msg =  "OK\r\n";
+		write(fd, msg, strlen(msg));
+	}else{
+		const char *msg = "DENIED\r\n";
+		write(fd, msg, strlen(msg));
+	}
 	return;		
 }
 
