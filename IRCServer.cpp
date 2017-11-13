@@ -466,7 +466,7 @@ IRCServer::initialize()
 }
 
 bool
-IRCServer::checkPassword(int fd, const char * user, const char * password) {
+IRCServer::checkPassword(int fd, char * user, char * password) {
 	// Here check the password
 	UserNode *n;
 	n = userList -> head;
@@ -485,10 +485,10 @@ IRCServer::checkPassword(int fd, const char * user, const char * password) {
 }
 
 void
-IRCServer::addUser(int fd, const char * user, const char * password, const char * args)
+IRCServer::addUser(int fd, char * user, char * password, const char * args)
 {
 	// Here add a new user. For now always return OK.
-	if(userExists(userList,user) == 1){
+	if(userExists(userList,user) == 0){
 		addUserList(userList, user, password, 1);
 		const char * msg =  "OK\r\n";
 		write(fd, msg, strlen(msg));
