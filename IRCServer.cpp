@@ -120,9 +120,19 @@ int numOfUsers(UserList *list){
 }
 
 int saveUserList(UserList *list, char *file_name){
-}
-
-int readUserList(UserList *list, char *file_name){
+	UserNode *n;
+	n = list -> head;
+	FILE *ptr;
+	ptr = fopen(file_name, "w");
+	if(ptr == NULL){
+		return 0;
+	}
+	while(n != NULL){
+		fprintf(ptr, "%d\n", n -> value);
+		n = n -> next;
+	}
+	fclose(ptr);
+	return 0;
 }
 
 void clearUsers(UserList *list){
