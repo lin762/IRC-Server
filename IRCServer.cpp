@@ -550,7 +550,7 @@ void
 IRCServer::leaveRoom(int fd, char * user, char * password, char * args)
 {
 	if(userExists(userList, user) == 1){
-		if(checkPassword(user, password) == 1){
+		if(checkPassword(fd, user, password) == 1){
 			if(roomExists(roomList, args) ==  1){
 				int user_entered_room = 0;
 				RoomNode *n;
