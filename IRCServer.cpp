@@ -485,7 +485,7 @@ IRCServer::checkPassword(int fd, char * user, char * password) {
 }
 
 void
-IRCServer::addUser(int fd, char * user, char * password, const char * args)
+IRCServer::addUser(int fd, char * user, char * password, char * args)
 {
 	// Here add a new user. For now always return OK.
 	if(userExists(userList,user) == 0){

@@ -12,9 +12,9 @@ private:
 
 public:
 	void initialize();
-	bool checkPassword(int fd, const char * user, const char * password);
+	bool checkPassword(int fd, char * user, char * password);
 	void processRequest( int socket );
-	void addUser(int fd, const char * user, const char * password, const char * args);
+	void addUser(int fd, char * user, char * password, char * args);
 	void enterRoom(int fd, const char * user, const char * password, const char * args);
 	void leaveRoom(int fd, const char * user, const char * password, const char * args);
 	void sendMessage(int fd, const char * user, const char * password, const char * args);
