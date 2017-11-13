@@ -93,6 +93,19 @@ int userExists(UserList *list, char *username){
 }
 
 int userRemove(UserList *list, char *username){
+	UserNode *n;
+	n = list -> head;
+	if(strcmp(n -> username, username) == 0){
+		list -> head = n -> next;
+		return 1;
+	}
+	while(n -> next != NULL){
+		if(strcmp(n -> next -> username, username) == 0){
+			n -> next = n -> next -> next;
+			return 1;
+		}
+	}
+	return 0;
 }
 
 int numOfUsers(UserList *list){
