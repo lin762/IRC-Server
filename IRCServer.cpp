@@ -81,7 +81,7 @@ void addUser(UserList *list, char *username, char *password, int writeFile){
 }
 
 void sortUserList(UserList *list){
-	
+}
 
 
 	
