@@ -50,7 +50,7 @@ typedef struct UserList UserList;
 
 void initUserList(UserList *list);
 void printUserList(UserList *list);
-void addUser(UserList *list, char *username, char *password, int writeFile);
+void addUserList(UserList *list, char *username, char *password, int writeFile);
 int userExists(UserList *list, char *username);
 int userRemove(UserList *list, char *username);
 int numOfUsers(UserList *list);

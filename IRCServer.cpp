@@ -59,7 +59,7 @@ void printUserList(UserList *list){
 	printf("}\n");
 }
 
-void addUser(UserList *list, char *username, char *password, int writeFile){
+void addUserList(UserList *list, char *username, char *password, int writeFile){
 	UserNode *n = (UserNode *)malloc(sizeof(UserNode));
 	n -> username = strdup(username);
 	n -> password = strdup(password);
