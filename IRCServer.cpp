@@ -109,6 +109,14 @@ int userRemove(UserList *list, char *username){
 }
 
 int numOfUsers(UserList *list){
+	int count = 0;
+	UserNode *n;
+	n = list -> head;
+	while(n != NULL){
+		count++;
+		n = n -> next;
+	}
+	return count;
 }
 
 int saveUserList(UserList *list, char *file_name){
