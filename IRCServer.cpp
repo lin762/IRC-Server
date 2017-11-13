@@ -500,7 +500,7 @@ IRCServer::addUser(int fd, char * user, char * password, char * args)
 }
 
 void
-IRCServer::enterRoom(int fd, const char * user, const char * password, const char * args)
+IRCServer::enterRoom(int fd, char * user, char * password, char * args)
 {
 	if(userExists(userList, user) == 1){
 		if(checkPassword(fd, user, password) == 1){
@@ -535,27 +535,27 @@ IRCServer::enterRoom(int fd, const char * user, const char * password, const cha
 }
 
 void
-IRCServer::leaveRoom(int fd, const char * user, const char * password, const char * args)
+IRCServer::leaveRoom(int fd, char * user, char * password, char * args)
 {
 }
 
 void
-IRCServer::sendMessage(int fd, const char * user, const char * password, const char * args)
+IRCServer::sendMessage(int fd, char * user, char * password, char * args)
 {
 }
 
 void
-IRCServer::getMessages(int fd, const char * user, const char * password, const char * args)
+IRCServer::getMessages(int fd, char * user, char * password, char * args)
 {
 }
 
 void
-IRCServer::getUsersInRoom(int fd, const char * user, const char * password, const char * args)
+IRCServer::getUsersInRoom(int fd, char * user, char * password, char * args)
 {
 }
 
 void
-IRCServer::getAllUsers(int fd, const char * user, const char * password,const  char * args)
+IRCServer::getAllUsers(int fd, char * user, char * password, char * args)
 {
 
 }

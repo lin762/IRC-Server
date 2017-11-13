@@ -15,12 +15,12 @@ public:
 	bool checkPassword(int fd, char * user, char * password);
 	void processRequest( int socket );
 	void addUser(int fd, char * user, char * password, char * args);
-	void enterRoom(int fd, const char * user, const char * password, const char * args);
-	void leaveRoom(int fd, const char * user, const char * password, const char * args);
-	void sendMessage(int fd, const char * user, const char * password, const char * args);
-	void getMessages(int fd, const char * user, const char * password, const char * args);
-	void getUsersInRoom(int fd, const char * user, const char * password, const char * args);
-	void getAllUsers(int fd, const char * user, const char * password, const char * args);
+	void enterRoom(int fd, char * user, char * password, char * args);
+	void leaveRoom(int fd, char * user, char * password, char * args);
+	void sendMessage(int fd, char * user, char * password, char * args);
+	void getMessages(int fd, char * user, char * password, char * args);
+	void getUsersInRoom(int fd, char * user, char * password, char * args);
+	void getAllUsers(int fd, char * user, char * password, char * args);
 	void runServer(int port);
 };
 
