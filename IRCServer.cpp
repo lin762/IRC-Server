@@ -623,7 +623,7 @@ IRCServer::getAllUsers(int fd, char * user, char * password, char * args)
 			if(n != NULL){
 				const char *msg;
 				while(n != NULL){
-					write(fd, n -> username; strlen(n -> username));
+					write(fd, n -> username, strlen(n -> username));
 					write(fd, "\r\n", 2);
 					n = n -> next;
 				}
