@@ -205,6 +205,18 @@ void addRoom(RoomList  *list, char *name){
 	
 }
 
+int roomExists(RoomList *list, char *name){
+	RoomNode *n;
+	n = list -> head;
+	while(n != NULL){
+		if(strcmp(n -> name, name) == 0){
+			return 1;
+		}
+		n = n -> next;
+	}
+	return 0;
+}
+
 RoomNode *getIthRoom(RoomList *list, int i){
 	RoomNode *n;
 	int count = 0;
