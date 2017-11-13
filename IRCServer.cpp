@@ -442,11 +442,22 @@ IRCServer::processRequest( int fd )
 void
 IRCServer::initialize()
 {
-	// Open password file
+	userList = (UserList*)malloc(sizeof(UserList));
+	initUserList(userList);
 
-	// Initialize users in room
-
-	// Initalize message list
+	roomList = (RoomList*)malloc(sizeof(RoomList));
+	initRoomList(roomList);
+	
+	FILE*fd = fopen("password.txt", "w");
+	char fileuser[100];
+	char filepassword[100];
+	if(fd == NULL){
+		return;
+	}
+	while(fscanf(fd, "%s %s\n", fileuser, filepassword) == 2){
+		addUser(userList, fileuser, filepassword,1);
+	}
+	fclose(userFile);
 
 }
 
