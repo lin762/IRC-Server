@@ -72,8 +72,10 @@ void addUser(UserList *list, char *username, char *password, int writeFile){
 		fprintf(fd, "%s %s\n", n -> username, n -> password);
 		fclose(fd);
 	}
-	sortUserList(list);
+//	sortUserList(list);
 }
+
+
 	
 int
 IRCServer::open_server_socket(int port) {
