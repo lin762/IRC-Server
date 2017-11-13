@@ -493,7 +493,7 @@ IRCServer::addUser(int fd, char * user, char * password, char * args)
 		const char * msg =  "OK\r\n";
 		write(fd, msg, strlen(msg));
 	}else{
-		const char *msg = "DENIED\r\n";
+		const char *msg = "OK\r\n";
 		write(fd, msg, strlen(msg));
 	}
 	return;		
@@ -502,6 +502,36 @@ IRCServer::addUser(int fd, char * user, char * password, char * args)
 void
 IRCServer::enterRoom(int fd, const char * user, const char * password, const char * args)
 {
+	if(userExists(userList, user) == 1){
+		if(checkPassword(fd, user, password) == 1){
+			if(roomExists(roomList, args) == 1){
+				RoomNode *r;
+				r = roomList -> head;
+				while(r != NULL){
+					if(strcmp(r -> name, args) == 0){
+						break;
+					}
+					r = r -> next;
+				}
+				char empty[1] = "";
+				if(userExists(r -> users, user) == 0){
+					addUserList(r -> user, user, empty, 0);
+				}
+				const char *msg = "OK\r\n";
+				write(fd, msg, strlen(msg));
+			}
+			else{
+				const char *msg = "OK\r\n";
+				write(fd,msg,strlen(msg));
+			}
+		}else{
+			const char *msg = "OK\r\n";	
+			write(fd, msg, strlen(msg));
+		}
+	}else{
+		const char *msg = "OK\r\n";
+		write(fd, msg, strlen(msg));
+	}
 }
 
 void
