@@ -81,6 +81,15 @@ void addUser(UserList *list, char *username, char *password, int writeFile){
 }
 
 int userExists(UserList *list, char *username){
+	UserNode *n;
+	n = list -> head;
+	while(n != NULL){
+		if(strcmp(n -> username, username) == 0){
+			return 1;
+		}
+		n = n -> next;
+	}
+	return 0;
 }
 
 int userRemove(UserList *list, char *username){
