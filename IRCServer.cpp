@@ -217,15 +217,7 @@ RoomNode *getIthRoom(RoomList *list, int i){
 		n = n -> next;
 	}
 }
-
-int roomExists(RoomList *list, char *name){
-}
-
-int roomRemove(RoomList *list, char *name){
-}
-
-void clearRoom(RoomList *list){
-}	
+	
 int
 IRCServer::open_server_socket(int port) {
 
