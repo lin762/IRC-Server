@@ -549,6 +549,52 @@ IRCServer::enterRoom(int fd, char * user, char * password, char * args)
 void
 IRCServer::leaveRoom(int fd, char * user, char * password, char * args)
 {
+	if(userExists(userList, user) == 1){
+		if(checkPassword(user, password) == 1){
+			if(roomExists(roomList, args) ==  1){
+				int user_entered_room = 0;
+				RoomNode *n;
+				n = roomList -> head;
+				while(n != NULL){
+					if(strcmp(n -> name, args) == 0){
+						break;
+					}
+					n = n -> next;
+				}
+				UserNode *u;
+				u = n -> users -> head;
+				const char *msg;
+				while(u != NULL){
+					if(strcmp(u -> username, user) == 0){
+						user_entered_room = 1;
+						break;
+					}
+					u = u -> next;
+				}
+				if(user_entered_room == 1){
+					if(userRemove(n -> users, user) == 1){
+						const char *msg = "OK\r\n";
+						write(fd, msg, strlen(msg));
+					}else{
+						const char *msg = "OK\r\n";
+						write(fd, msg, strlen(msg));
+					}
+				}else{
+					const char *msg = "OK\r\n";	
+					write(fd, msg, strlen(msg));
+				}
+			}else{
+				const char *msg = "OK\r\n";
+				write(fd, msg, strlen(msg));
+			}
+		}else{
+			const char *msg = "OK\r\n";
+			write(fd, msg, strlen(msg));
+		}
+	}else{
+		const char *msg = "OK\r\n";
+		write(fd, msg, strlen(msg));
+	}
 }
 
 void
