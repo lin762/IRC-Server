@@ -136,6 +136,15 @@ int saveUserList(UserList *list, char *file_name){
 }
 
 void clearUsers(UserList *list){
+	UserNode *n;
+	n = list -> head;
+	UserNode *temp;
+	while(n != NULL){
+		temp = n -> next;
+		free(n);
+		n = temp;
+	}
+	list -> head = NULL;
 }
 
 void sortUserList(UserList *list){
