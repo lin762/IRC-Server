@@ -515,7 +515,7 @@ IRCServer::enterRoom(int fd, char * user, char * password, char * args)
 				}
 				char empty[1] = "";
 				if(userExists(r -> users, user) == 0){
-					addUserList(r -> user, user, empty, 0);
+					addUserList(r -> users, user, empty, 0);
 				}
 				const char *msg = "OK\r\n";
 				write(fd, msg, strlen(msg));
