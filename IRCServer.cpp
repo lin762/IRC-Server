@@ -600,6 +600,7 @@ IRCServer::leaveRoom(int fd, char * user, char * password, char * args)
 void
 IRCServer::sendMessage(int fd, char * user, char * password, char * args)
 {
+	
 }
 
 void
@@ -615,6 +616,26 @@ IRCServer::getUsersInRoom(int fd, char * user, char * password, char * args)
 void
 IRCServer::getAllUsers(int fd, char * user, char * password, char * args)
 {
-
+	if(userExists(userList, user) == 1){
+		if(checkPassword(fd, user, password) == 1){
+			UserNode *n;
+			n = userList -> head;
+			if(n != NULL){
+				const char *msg;
+				while(n != NULL){
+					write(fd, n -> username; strlen(n -> username));
+					write(fd, "\r\n", 2);
+					n = n -> next;
+				}
+				write(fd, "\r\n", 2);
+			}
+		}else{
+			const char *msg = "OK\r\n";
+			write(fd, msg, strlen(msg));
+		}
+	}else{
+		const char *msg = "OK\r\n";
+		write(fd, msg, strlen(msg));
+	}
 }
 
