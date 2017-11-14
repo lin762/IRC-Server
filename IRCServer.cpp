@@ -28,344 +28,101 @@ const char * usage =
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
+#include <iostream>
+#include <fstream>
+#include <map>
+#include <string>
+using namespace std;
+
 #include "IRCServer.h"
 
-/**
-	UserList.c
-**/
-
-void userlist_init(UserList * list)
-{
-	list->head = NULL;
-}
-
-//
-// It prints the elements in the list in the form:
-// 4, 6, 2, 3, 8,7
-//
-void userlist_print(UserList * list) {
-	
-	ListUserNode * e;
-
-	if (list->head == NULL) {
-		printf("{EMPTY}\n");
-		return;
-	}
-
-	printf("{");
-
-	e = list->head;
-	while (e != NULL) {
-		printf("%d", e->value);
-		e = e->next;
-		if (e!=NULL) {
-			printf(", ");
-		}
-	}
-	printf("}\n");
-}
-//
-// Appends a new node with this value at the beginning of the list
-//
-void userlist_add(UserList * list, char *user, char *password, int writeToFile) {
-	// Create new node
-	ListUserNode * n = (ListUserNode *) malloc(sizeof(ListUserNode));
-	n->username = strdup(user);
-	n->password = strdup(password);
-	//printf("added user: %s with password: %s\n", n->username, n->password);
-	// Add at the beginning of the list
-	n->next = list->head;
-	list->head = n;
-
-	if(writeToFile) {
-		FILE *userFile;
-		userFile = fopen("password.txt", "w");
-		ListUserNode *e;
-		e = list->head;
-		while(e != NULL) {
-			fprintf(userFile, "%s %s\n", e->username, e->password);
-			//printf("password read: %s\n", e->password);
-			e = e->next;
-		}
-		fclose(userFile);
-	}
-	userlist_sort(list);
-}
-
-//
-// Returns true if the value exists in the list.
-//
-int userlist_exists(UserList * list, char *user) {
-	ListUserNode * e;
-	e = list->head;
-	while(e != NULL) {
-		//printf("%s | %s", e->username, user);
-		if(strcmp(e->username, user) == 0) {
-			return 1;
-		}
-		e = e->next;
-	}
-	return 0;
-}
-
-//
-// It removes the entry with that value in the list.
-//
-int userlist_remove(UserList * list, char *username) {
-	ListUserNode * e;
-	e = list->head;
-	if(strcmp(e->username, username) == 0) {
-		list->head = e->next;
-		return 1;
-	}
-	while(e->next != NULL) {
-		if(strcmp(e->next->username, username) == 0) {
-			e->next = e->next->next;
-			return 1;
-		}
-		e = e->next;
-	}
-	return 0;
-}
-
-
-//
-// It returns the number of elements in the list.
-//
-int userlist_number_elements(UserList * list) {
-	ListUserNode * e;
-	e = list->head;
-	int counter;
-	counter = 0;
-	while(e != NULL) {
-		counter++;
-		e = e->next;
-	}
-	return counter;
-}
-
-
-//
-// It saves the list in a file called file_name. The format of the
-// file is as follows:
-//
-// value1\n
-// value2\n
-// ...
-//
-int userlist_save(UserList * list, char * file_name) {
-	ListUserNode *e;
-	e = list->head;
-	FILE *fptr;
-	fptr = fopen(file_name, "w");
-	if(fptr == NULL) {
-		//printf("A");
-		return 0;
-	}
-	while(e != NULL) {
-		fprintf(fptr, "%d\n",e->value);
-	 	e = e->next;
-	}
-	fclose(fptr);
-	return 0;
-}
-//
-// Clear all elements in the list and free the nodes
-//
-void userlist_clear(UserList *list)
-{
-	ListUserNode *e = list->head;
-	ListUserNode *temp;
-	while(e != NULL) {
-		temp = e->next;
-		free(e);
-		e = temp;
-	}
-	list->head = NULL;
-}
-
-void userlist_sort(UserList * list) {
-	ListUserNode *first;
-	ListUserNode *second;
-	int temp, flag;
-	first = list->head;
-	flag = 1;
-	second = first->next;
-	while(flag == 1) {
-		//llist_print(list);
-		flag = 0;
-		first = list->head;
-		second = first->next;
-		while(second != NULL) {
-			//printf("%d", first->value);
-			if(strcmp(first->username, second->username) > 0) {
-				char *temp_username;
-				char *temp_password;
-
-				temp = first->value;
-				first->value = second->value;
-				second->value = temp;
-
-				temp_username = strdup(first->username);
-				first->username = strdup(second->username);
-				second->username = strdup(temp_username);
-
-				temp_password = strdup(first->password);
-				first->password = strdup(second->password);
-				second->password = strdup(temp_password);
-
-				first = second->next;
-				flag = 1;
-				break;
-			}
-			else {
-				first = second;
-				second = second->next;
-			}
-		}
-	}
-}
-
-/* END USERLIST */
-void roomlist_init(RoomList * list)
-{
-	list->head = NULL;
-}
-//
-// Appends a new node with this value at the beginning of the list
-//
-void roomlist_add(RoomList * list, char *name) {
-	// Create new node
-	ListRoomNode * n = (ListRoomNode *) malloc(sizeof(ListRoomNode));
-	UserList *ulist = (UserList*)malloc(sizeof(UserList));
-	userlist_init(ulist);
-	n->messageCounter = 0;
-	n->name = name;
-	n->users_in_room = ulist;
-	
-	n->next = list->head;
-	list->head = n;
-}
-//
-// Returns true if the value exists in the list.
-//
-int roomlist_exists(RoomList * list, char *name) {
-	ListRoomNode * e;
-	e = list->head;
-	while(e != NULL) {
-		if(strcmp(e->name, name) == 0) {
-			return 1;
-		}
-		e = e->next;
-	}
-	return 0;
-}
-ListRoomNode* roomlist_get_ith(RoomList * list, int ith) {
-	ListRoomNode * e;
-	int counter;
-	counter = 0;
-	e = list->head;
-	while(e != NULL) {
-		if(counter == ith) {
-			return e;
-		}
-		counter++;
-		e = e->next;
-	}
-}
-
-/**
-	END ROOMLIST
-**/
-
 int QueueLength = 5;
-
 int
 IRCServer::open_server_socket(int port) {
-
-	// Set the IP address and port for this server
-	struct sockaddr_in serverIPAddress; 
-	memset( &serverIPAddress, 0, sizeof(serverIPAddress) );
-	serverIPAddress.sin_family = AF_INET;
-	serverIPAddress.sin_addr.s_addr = INADDR_ANY;
-	serverIPAddress.sin_port = htons((u_short) port);
-  
-	// Allocate a socket
-	int masterSocket =  socket(PF_INET, SOCK_STREAM, 0);
-	if ( masterSocket < 0) {
-		perror("socket");
-		exit( -1 );
-	}
-
-	// Set socket options to reuse port. Otherwise we will
-	// have to wait about 2 minutes before reusing the sae port number
-	int optval = 1; 
-	int err = setsockopt(masterSocket, SOL_SOCKET, SO_REUSEADDR, 
-			     (char *) &optval, sizeof( int ) );
-	
-	// Bind the socket to the IP address and port
-	int error = bind( masterSocket,
-			  (struct sockaddr *)&serverIPAddress,
-			  sizeof(serverIPAddress) );
-	if ( error ) {
-		perror("bind");
-		exit( -1 );
-	}
-	
-	// Put socket in listening mode and set the 
-	// size of the queue of unprocessed connections
-	error = listen( masterSocket, QueueLength);
-	if ( error ) {
-		perror("listen");
-		exit( -1 );
-	}
-
-	return masterSocket;
+    
+    // Set the IP address and port for this server
+    struct sockaddr_in serverIPAddress;
+    memset( &serverIPAddress, 0, sizeof(serverIPAddress) );
+    serverIPAddress.sin_family = AF_INET;
+    serverIPAddress.sin_addr.s_addr = INADDR_ANY;
+    serverIPAddress.sin_port = htons((u_short) port);
+    
+    // Allocate a socket
+    int masterSocket =  socket(PF_INET, SOCK_STREAM, 0);
+    if ( masterSocket < 0) {
+        perror("socket");
+        exit( -1 );
+    }
+    
+    // Set socket options to reuse port. Otherwise we will
+    // have to wait about 2 minutes before reusing the sae port number
+    int optval = 1;
+    int err = setsockopt(masterSocket, SOL_SOCKET, SO_REUSEADDR,
+                         (char *) &optval, sizeof( int ) );
+    
+    // Bind the socket to the IP address and port
+    int error = bind( masterSocket,
+                     (struct sockaddr *)&serverIPAddress,
+                     sizeof(serverIPAddress) );
+    if ( error ) {
+        perror("bind");
+        exit( -1 );
+    }
+    
+    // Put socket in listening mode and set the
+    // size of the queue of unprocessed connections
+    error = listen( masterSocket, QueueLength);
+    if ( error ) {
+        perror("listen");
+        exit( -1 );
+    }
+    
+    return masterSocket;
 }
 
 void
 IRCServer::runServer(int port)
 {
-	int masterSocket = open_server_socket(port);
-
-	initialize();
-	
-	while ( 1 ) {
-		
-		// Accept incoming connections
-		struct sockaddr_in clientIPAddress;
-		int alen = sizeof( clientIPAddress );
-		int slaveSocket = accept( masterSocket,
-					  (struct sockaddr *)&clientIPAddress,
-					  (socklen_t*)&alen);
-		
-		if ( slaveSocket < 0 ) {
-			perror( "accept" );
-			exit( -1 );
-		}
-		
-		// Process request.
-		processRequest( slaveSocket );		
-	}
+    int masterSocket = open_server_socket(port);
+    
+    initialize();
+    
+    while ( 1 ) {
+        
+        // Accept incoming connections
+        struct sockaddr_in clientIPAddress;
+        int alen = sizeof( clientIPAddress );
+        int slaveSocket = accept( masterSocket,
+                                 (struct sockaddr *)&clientIPAddress,
+                                 (socklen_t*)&alen);
+        
+        if ( slaveSocket < 0 ) {
+            perror( "accept" );
+            exit( -1 );
+        }
+        
+        // Process request.
+        processRequest( slaveSocket );
+    }
 }
 
 int
 main( int argc, char ** argv )
 {
-	// Print usage if not enough arguments
-	if ( argc < 2 ) {
-		fprintf( stderr, "%s", usage );
-		exit( -1 );
-	}
-	
-	// Get the port from the arguments
-	int port = atoi( argv[1] );
-
-	IRCServer ircServer;
-
-	// It will never return
-	ircServer.runServer(port);
-	
+    // Print usage if not enough arguments
+    if ( argc < 2 ) {
+        fprintf( stderr, "%s", usage );
+        exit( -1 );
+    }
+    
+    // Get the port from the arguments
+    int port = atoi( argv[1] );
+    
+    IRCServer ircServer;
+    
+    // It will never return
+    ircServer.runServer(port);
+    
 }
 
 //
@@ -416,438 +173,580 @@ main( int argc, char ** argv )
 void
 IRCServer::processRequest( int fd )
 {
-	// Buffer used to store the comand received from the client
-	const int MaxCommandLine = 1024;
-	char *commandLine = (char*)malloc(sizeof(char) * (MaxCommandLine + 1));
-	int commandLineLength = 0;
-	int n;
-	
-	// Currently character read
-	unsigned char prevChar = 0;
-	unsigned char newChar = 0;
-	
-	while(commandLineLength < MaxCommandLine && read( fd, &newChar, 1) > 0){
-		if (newChar == '\n' && prevChar == '\r') {
-			break;
-		}
-		
-		commandLine[ commandLineLength ] = newChar;
-		commandLineLength++;
-
-		prevChar = newChar;
-	}
-	
-	// Add null character at the end of the string
-	// Eliminate last \r
-	commandLineLength--;
-        commandLine[ commandLineLength ] = 0;
-
-	//printf("RECEIVED: %s\n", commandLine);
-
-	// printf("The commandLine has the following format:\n");
-	// printf("COMMAND <user> <password> <arguments>. See below.\n");
-	// printf("You need to separate the commandLine into those components\n");
-	// printf("For now, command, user, and password are hardwired.\n");
-
-	char *temp_commandLine = commandLine;
-	char *command = (char*)malloc(sizeof(char) * 100);
-	char *user = (char*)malloc(sizeof(char) * 100);
-	char *password = (char*)malloc(sizeof(char) * 100);
-	char *args = (char*)malloc(sizeof(char) * 100);
-
-	command = strtok (commandLine," ");
-	user = strtok (NULL, " ");
-	password = strtok (NULL, " ");
-	args = strtok (NULL, "\n");
-
-	if (!strcmp(command, "ADD-USER")) {
-		addUser(fd, user, password, args);
-	}
-	else if (!strcmp(command, "ENTER-ROOM")) {
-		enterRoom(fd, user, password, args);
-	}
-	else if (!strcmp(command, "LEAVE-ROOM")) {
-		leaveRoom(fd, user, password, args);
-	}
-	else if (!strcmp(command, "SEND-MESSAGE")) {
-		sendMessage(fd, user, password, args);
-	}
-	else if (!strcmp(command, "GET-MESSAGES")) {
-		getMessages(fd, user, password, args);
-	}
-	else if (!strcmp(command, "GET-USERS-IN-ROOM")) {
-		getUsersInRoom(fd, user, password, args);
-	}
-	else if (!strcmp(command, "GET-ALL-USERS")) {
-		getAllUsers(fd, user, password, args);
-	}
-	else {
-		const char * msg =  "UNKNOWN COMMAND\r\n";
-		write(fd, msg, strlen(msg));
-	}
-
-	// Send OK answer
-	//const char * msg =  "OK\n";
-	//write(fd, msg, strlen(msg));
-
-	close(fd);	
+    // Buffer used to store the comand received from the client
+    const int MaxCommandLine = 1024;
+    char commandLine[ MaxCommandLine + 1 ];
+    int commandLineLength = 0;
+    int n;
+    
+    // Currently character read
+    unsigned char prevChar = 0;
+    unsigned char newChar = 0;
+    
+    //
+    // The client should send COMMAND-LINE\n
+    // Read the name of the client character by character until a
+    // \n is found.
+    //
+    
+    // Read character by character until a \n is found or the command string is full.
+    while ( commandLineLength < MaxCommandLine &&
+           read( fd, &newChar, 1) > 0 ) {
+        
+        if (newChar == '\n' && prevChar == '\r') {
+            break;
+        }
+        
+        commandLine[ commandLineLength ] = newChar;
+        commandLineLength++;
+        
+        prevChar = newChar;
+    }
+    
+    // Add null character at the end of the string
+    // Eliminate last \r
+    commandLineLength--;
+    commandLine[ commandLineLength ] = 0;
+    
+    printf("RECEIVED: %s\n", commandLine);
+    
+    printf("The commandLine has the following format:\n");
+    printf("COMMAND <user> <password> <arguments>. See below.\n");
+    printf("You need to separate the commandLine into those components\n");
+    printf("For now, command, user, and password are hardwired.\n");
+    int i=0;
+    char word[5][30];
+    int length=strlen(commandLine);
+    int j=0, k=0;
+    while (i<length) {
+        if (j==3) {
+            word[3][k]=commandLine[i];
+            k++;
+        }
+        if (commandLine[i]== ' ' &&j!=3) {
+            word[j][k] = '\0';
+            j++;
+            k = 0;
+            printf("SPACE\n");
+        }else if (j!=3){
+            printf("%c\n", commandLine[i]);
+            word[j][k] = commandLine[i];
+            k++;
+        }
+        
+        i++;
+    }
+    word[j][k]='\0';
+    const char * command = word[0];
+    const char * user = word[1];
+    const char * password = word[2];
+    const char * args = "";
+    if (j>=3){
+        args=word[3];
+    }
+    
+    
+    
+    printf("command=%s\n", command);
+    printf("user=%s\n", user);
+    printf( "password=%s\n", password );
+    printf("args=%s\n", args);
+    
+    if (!strcmp(command, "ADD-USER")) {
+        addUser(fd, user, password, args);
+    }else if(!strcmp(command, "CREATE-ROOM")){
+        createRoom(fd, user, password, args);
+    }else if (!strcmp(command, "ENTER-ROOM")) {
+        enterRoom(fd, user, password, args);
+    }
+    else if (!strcmp(command, "LEAVE-ROOM")) {
+        leaveRoom(fd, user, password, args);
+    }
+    else if (!strcmp(command, "SEND-MESSAGE")) {
+        sendMessage(fd, user, password, args);
+    }
+    else if (!strcmp(command, "GET-MESSAGES")) {
+        getMessages(fd, user, password, args);
+    }
+    else if (!strcmp(command, "GET-USERS-IN-ROOM")) {
+        getUsersInRoom(fd, user, password, args);
+    }
+    else if (!strcmp(command, "GET-ALL-USERS")) {
+        getAllUsers(fd, user, password, args);
+    }
+    else {
+        const char * msg =  "UNKNOWN COMMAND\r\n";
+        write(fd, msg, strlen(msg));
+    }
+    
+    // Send OK answer
+    //const char * msg =  "OK\n";
+    //write(fd, msg, strlen(msg));
+    
+    close(fd);
 }
-UserList *usersList;
-RoomList * roomsList;
-int maxMessages = 100;
+#define MAXWORD 200
+char word[MAXWORD];
+int wordLength;
+char * IRCServer::nextword(FILE * fd) {
+    int c;
+    int i = 0;
+    wordLength = 0;
+    // While it is not EOF read char
+    while ((c= fgetc(fd)) != EOF) {
+        if (c == ' '|| c == '\n' || c == '\t'|| c == '\r') {
+            if (wordLength > 0)
+                return word;
+        }
+        else {
+            word[i] = c;
+            i++;
+            word[i]='\0';
+            wordLength++;
+        }
+    }
+    if (wordLength > 0)
+        return word;
+    else
+        return NULL;
+}
+
+int userCount = 0;
+int messCount;
+int roomCount;
+const char * argsRoomName = (char *) malloc (100 * sizeof(char));
+const char * currentMessage = (char *) malloc (1000 * sizeof(char));
+
+struct userCheck {
+    char * username;
+    char * password;
+    int rooms[50];
+};
+
+char username[100];
+char password[100];
+
+struct Rooms {
+    char * users[100];
+    char * roomName;
+    char * messages[100];
+    int userRoomCount;
+    int cMessCount;
+    int inside;
+};
+
+typedef Rooms Rooms;
+Rooms * RoomArray;
+
+typedef userCheck userCheck;
+userCheck * userArray;
+
+
+
+
 void
 IRCServer::initialize()
 {
-	usersList = (UserList*)malloc(sizeof(UserList));
-	userlist_init(usersList);
-
-	roomsList = (RoomList*)malloc(sizeof(RoomList));
-	roomlist_init(roomsList);
-
-	FILE *userFile;
-	char fileuser[100];
-	char filepassword[100];
-	userFile = fopen("password.txt", "r");
-	if(userFile == NULL) {
-		return;
-	}
-	while(fscanf(userFile, "%s %s\n", fileuser, filepassword) == 2) {
-		userlist_add(usersList, fileuser, filepassword, 1);
-	}
-	fclose(userFile);
+    userCount=0;
+    userArray = (userCheck * )malloc(100 * sizeof(userCheck));
+    FILE *fp= fopen("password.txt", "w+");
+    char * c = (char * )malloc(100*sizeof(char));
+    int i=0;
+    while ((c = nextword(fp))!='\0') {
+        std::string sfromC(c);
+        if (sfromC!="\n") {
+            if (i==0 ) {
+                userArray[userCount].username = strdup(c);
+                i=1;
+                continue;
+            }
+            else if(i==1){
+                userArray[userCount].password = strdup(c);
+                i=0;
+                userCount++;
+                continue;
+            }
+        }
+        
+    }
+    
+    roomCount =0;
+    RoomArray = (Rooms *)malloc(100 * sizeof(Rooms));
+    for (int j=0; j<100; j++) {
+        for (int k=0; k<100; k++) {
+            RoomArray[j].messages[k] = (char *)malloc(1000 *sizeof(char));
+        }
+    }
+    
+    fclose(fp);
+    
 }
 
 bool
-IRCServer::checkPassword(char * user, char * password) {
-	ListUserNode *e;
-	e = usersList->head;
-	if(strcmp(e->username, user) == 0) {
-		if(strcmp(e->password, password) == 0) {
-			return 1;
-		}
-		else {
-			return 0;
-		}
-	}
-	while(e != NULL) {
-		if(strcmp(e->username, user) == 0) {
-			if(strcmp(e->password, password) == 0) {
-				return 1;
-			}
-			else {
-				return 0;
-			}
-		}		
-		e = e->next;
-	}
+IRCServer::checkPassword(int fd, const char * user, const char * password) {
+    // Here check the password
+    
+    int i = 0;
+    char * nameCheck=strdup(user);
+    char * passCheck=strdup(password);
+    for (; i<userCount; i++) {
+        printf("%s\n @@%s\n", userArray[i].username, userArray[i].password);
+        if (strcmp(userArray[i].username, nameCheck) == 0 &&strcmp(userArray[i].password, password) ==0) {
+            printf("Password is correct!\n");
+            return true;
+        }
+    }
+    return false;
 }
 
 void
-IRCServer::addUser(int fd, char * user, char * password, char * args)
+IRCServer::addUser(int fd, const char * user, const char * password, const char * args)
 {
-	if(userlist_exists(usersList, user) == 0) {
-		userlist_add(usersList, user, password, 1);
-		const char * msg =  "OK\r\n";
-		write(fd, msg, strlen(msg));
-	}
-	else {
-		const char * msg =  "DENIED\r\n";
-		write(fd, msg, strlen(msg));
-	}
-	return;		
+    // Here add a new user. For now always return OK.
+    int temp  = 0;
+    FILE * fp = fopen("password.txt", "w+");
+    char * nameCheck = strdup(user);
+    char * passCheck = strdup(password);
+    int i=0;
+    for (; i<userCount; i++) {
+        printf("%s\n %s\n", userArray[i].username, nameCheck);
+        if (strcmp(userArray[i].username, nameCheck) == 0) {
+            temp = 1;
+            break;
+        }
+    }
+    if (temp !=1) {
+        userArray[userCount].username= nameCheck;
+        userArray[userCount].password= passCheck;
+        userCount++;
+        printf("%s\n ADD USER VERSION %s\n", userArray[userCount].username, userArray[userCount].password);
+        fclose(fp);
+        const char *msg = "OK\r\n";
+        write(fd, msg, strlen(msg));
+        return;
+    }
+    else {
+        const char * msg = "DENIED\r\n";
+        write(fd, msg, strlen(msg));
+        return;
+    }
+    
 }
 
-void IRCServer::enterRoom(int fd, char * user, char * password, char * args) {
-	if(userlist_exists(usersList, user) == 1) { // If user exists
-		if(checkPassword(user, password) == 1) { // If password is correct
-			if(roomlist_exists(roomsList, args) == 1) {
-				ListRoomNode * e;
-				e = roomsList->head;
-				while(e != NULL) {
-					if(strcmp(e->name, args) == 0) {
-						break;
-					}
-					e = e->next;
-				}
-				char empty[1] = "";
-				if(userlist_exists(e->users_in_room, user) == 0) {
-					userlist_add(e->users_in_room, user, empty, 0);
-				}
-				const char *msg = "OK\r\n";
-				write(fd, msg, strlen(msg));
-			}
-			else {
-				const char *msg = "ERROR (No room)\r\n";
-				write(fd, msg, strlen(msg));
-			}
-		}
-		else {
-			const char *msg = "ERROR (Wrong password)\r\n";
-			write(fd, msg, strlen(msg));
-		}
-	}
-	else {
-		const char *msg = "ERROR (Wrong password)\r\n";
-		write(fd, msg, strlen(msg));
-	}
+void IRCServer::createRoom(int fd, const char * user, const char * password, const char * args) {
+    int temp =0;
+    argsRoomName = strdup(args);
+    
+    if (checkPassword(fd, user, password)) {
+        for (int i = 0; i < roomCount; i++) {
+            if (!strcmp(RoomArray[i].roomName, argsRoomName)) {
+                temp = 1;
+                break;
+            }
+        }
+        if (temp != 1) {
+            RoomArray[roomCount].roomName = strdup(argsRoomName);
+            roomCount++;
+            const char * msg =  "OK\r\n";
+            write(fd, msg, strlen(msg));
+        } else {
+            const char * msg = "DENIED\r\n";
+            write(fd, msg, strlen(msg));
+            return;
+        }
+    } else {
+        const char * msg = "ERROR (Wrong password)\r\n";
+        write(fd, msg, strlen(msg));
+    }
 }
 
-void IRCServer::leaveRoom(int fd, char * user, char * password, char * args) {
-	if(userlist_exists(usersList, user) == 1) { // If user exists
-		if(checkPassword(user, password) == 1) { // If password is correct
-			if(roomlist_exists(roomsList, args) == 1) {
-				int user_entered_room = 0;
-				ListRoomNode * e;
-				e = roomsList->head;
-				while(e != NULL) {
-					if(strcmp(e->name, args) == 0) {
-						break;
-					}
-					e = e->next;
-				}
-				ListUserNode * u;
-				u = e->users_in_room->head;
-				const char *msg;
-				while(u != NULL) {
-					if(strcmp(u->username, user) == 0) {
-						user_entered_room = 1;
-						break;
-					}
-					u = u->next;	
-				}
-				if(user_entered_room == 1) {
-					if(userlist_remove(e->users_in_room, user) == 1) {
-						const char *msg = "OK\r\n";
-						write(fd, msg, strlen(msg));
-					}
-					else {
-						const char *msg = "DENIED\r\n";
-						write(fd, msg, strlen(msg));					
-					}
-				}
-				else {
-					const char *msg = "ERROR (No user in room)\r\n";
-					write(fd, msg, strlen(msg));
-				}
-			}
-			else {
-				const char *msg = "DENIED\r\n";
-				write(fd, msg, strlen(msg));
-			}
-		}
-		else {
-			const char *msg = "ERROR (Wrong password)\r\n";
-			write(fd, msg, strlen(msg));
-		}
-	}
-	else {
-		const char *msg = "ERROR (Wrong password)\r\n";
-		write(fd, msg, strlen(msg));
-	}
+void
+IRCServer::enterRoom(int fd, const char * user, const char * password, const char * args)
+{
+    int roomPos =0;
+    int flag = 0;
+    int temp =0;
+    char * message;
+    int i=0;
+    if (checkPassword(fd, user, password)) {
+        for (; i < roomCount; i++) {
+            if (!strcmp(RoomArray[i].roomName, argsRoomName)) {
+                roomPos = i;
+                temp = 1;
+                break;
+            }
+        }
+        if (temp == 0) {
+            strcpy(message, "ERROR-NO Room\r\n");
+            write(fd, message, strlen(message));
+            return;
+        }
+        for (i = 0; i < RoomArray[roomPos].userRoomCount; i++) {
+            if (!strcmp(user, RoomArray[roomPos].users[i])) {
+                flag = 1;
+                break;
+            }
+        }
+        if (flag == 0) {
+            RoomArray[roomPos].users[RoomArray[roomPos].userRoomCount] = strdup(user);
+            RoomArray[roomPos].userRoomCount++;
+            const char * msg =  "OK\r\n";
+            write(fd, msg, strlen(msg));
+        } else {
+            const char * msg =  "Already inside\r\n";
+            write(fd, msg, strlen(msg));
+        }
+    } else {
+        const char * msg = "ERROR (Wrong password)\r\n";
+        write(fd, msg, strlen(msg));
+    }
 }
 
-void IRCServer::sendMessage(int fd, char * user, char * password, char * args) {
-	if(userlist_exists(usersList, user) == 1) { // If user exists
-		if(checkPassword(user, password) == 1) { // If password is correct
-			char *splitted;
-			char *originalMessage;
-			char *roomName;
-			int roomNameLength = 0;
-			int entireMessageLength = 0;
-			int realMessageLength = 0;
-			originalMessage = strdup(args);
-			entireMessageLength = strlen(args);
-			roomName = strtok (args," ");
-			printf("%s\n", roomName);
-		  	roomNameLength = strlen(roomName);	  	
-		  	realMessageLength = entireMessageLength - roomNameLength;
-		  	if(roomlist_exists(roomsList, roomName) == 1) { // room exists
-				ListRoomNode * e;
-				e = roomsList->head;
-				while(e != NULL) {
-					if(strcmp(e->name, roomName) == 0) {
-						break;
-					}
-					e = e->next;
-				}
-				if(userlist_exists(e->users_in_room, user) == 1) {
-					originalMessage += strlen(roomName) + 1;
-					if(e->messageCounter >= maxMessages) {
-						e->m[e->messageCounter % maxMessages].message = strdup(originalMessage);
-						e->m[e->messageCounter % maxMessages].username = strdup(user);
-					}
-					else {
-						e->m[e->messageCounter].message = strdup(originalMessage);
-						e->m[e->messageCounter].username = strdup(user);
-					}
-					e->messageCounter = e->messageCounter + 1;
-					const char *msg = "OK\r\n";
-					write(fd, msg, strlen(msg));				
-				}
-			  	else {
-					const char *msg = "ERROR (user not in room)\r\n";
-					write(fd, msg, strlen(msg));
-				}				
-		  	}
-		  	else {
-				const char *msg = "DENIED\r\n";
-				write(fd, msg, strlen(msg));
-			}
-		}
-		else {
-			const char *msg = "ERROR (Wrong password)\r\n";
-			write(fd, msg, strlen(msg));
-		}
-	}
-	else {
-		const char *msg = "ERROR (Wrong password)\r\n";
-		write(fd, msg, strlen(msg));
-	}	
+void
+IRCServer::leaveRoom(int fd, const char * user, const char * password, const char * args)
+{
+    int tempRoomPos = 0;
+    int tempUserP = 0;
+    int aflag = 0;
+    int bflag = 0;
+    int i=0;
+    char * message = (char *) malloc (100 * sizeof(char));
+    if (checkPassword(fd, user, password)) {
+        for (; i < roomCount; i++) {
+            if (!strcmp(RoomArray[i].roomName, argsRoomName)) {
+                tempRoomPos = i;
+                aflag = 1;
+                break;
+            }
+        }
+        if (aflag ==1) {
+            i =0;
+            for (; i < RoomArray[tempRoomPos].userRoomCount; i++) {
+                if (!strcmp(RoomArray[tempRoomPos].users[i], user)) {
+                    tempUserP = i;
+                    bflag = 1;
+                    break;
+                }
+            }
+            if (bflag == 1) {
+                int j=0;
+                for (j = tempUserP; j < RoomArray[tempRoomPos].userRoomCount; j++) {
+                    RoomArray[tempRoomPos].users[j] = RoomArray[tempRoomPos].users[j + 1];
+                }
+                RoomArray[tempRoomPos].userRoomCount--;
+                const char * msg = "OK\r\n";
+                write(fd, msg, strlen(msg));
+            } else {
+                strcpy(message, "ERROR (No user in room)");
+                strcat(message, "\r\n");
+                write(fd, message, strlen(message));
+            }
+        }
+    } else {
+        const char * msg = "ERROR (Wrong password)\r\n";
+        write(fd, msg, strlen(msg));
+    }
 }
 
-void IRCServer::getMessages(int fd, char * user, char * password, char * args) {
-	if(userlist_exists(usersList, user) == 1) { 
-		if(checkPassword(user, password) == 1) { 
-			char *splitted;
-			char *temp_num;
-			int lastMessageNum;
-			char *roomName;
-			splitted = strtok (args," ");
-			temp_num = strdup(splitted);
-			lastMessageNum = atoi(temp_num);
-			splitted = strtok (NULL, " ");
-			roomName = strdup(splitted);
-			int count;
-			count = 0;
-			
-			if(roomlist_exists(roomsList, roomName) == 1) {
-				ListRoomNode * e;
-				e = roomsList->head;
-				while(e != NULL) {
-					if(strcmp(e->name, roomName) == 0) {
-						break;
-					}
-					e = e->next;
-				}
-				if(userlist_exists(e->users_in_room, user) == 1) {
-					int i;
-					char *msg;
-					if(maxMessages < e->messageCounter) {
-						lastMessageNum = 0;
-					}
-					if(lastMessageNum >= e->messageCounter) {
-						const char *msg = "NO-NEW-MESSAGES\r\n";
-						write(fd, msg, strlen(msg));
-						return;
-					}
-					if(e->messageCounter >= maxMessages) {
-						int begin;
-						begin = (e->messageCounter % maxMessages)+lastMessageNum;
-						for(i = begin; i < maxMessages; i++, count++) {
-							char buffer[500];
-							sprintf(buffer, "%d %s %s\r\n", e->messageCounter - maxMessages + count + 1, e->m[i].username, e->m[i].message);
-							const char *msg = buffer;
-							printf("%s\n", buffer);
-							write(fd, msg, strlen(msg));
-						}
-						for(i = 0; i < begin; i++) {
-							char buffer[500];
-							sprintf(buffer, "%d %s %s\r\n", e->messageCounter - maxMessages + count + i + 1, e->m[i].username, e->m[i].message);
-							printf("%s\n", buffer);
-							const char *msg = buffer;
-							write(fd, msg, strlen(msg));
-						}					
-					}
-					else {
-						for(i = lastMessageNum; i < e->messageCounter; i++) {
-							char buffer[500];
-							sprintf(buffer, "%d %s %s\r\n", i, e->m[i].username, e->m[i].message);
-							printf("%s\n", buffer);
-							const char *msg = buffer;
-							write(fd, msg, strlen(msg));
-						}
-					}
-					write(fd, "\r\n", 2);
-				}
-				else {
-					const char *msg = "ERROR (User not in room)\r\n";
-					write(fd, msg, strlen(msg));
-				}
-			}
-			else {
-				const char *msg = "DENIED\r\n";
-				write(fd, msg, strlen(msg));
-			}			
-		}
-		else {
-			const char *msg = "ERROR (Wrong password)\r\n";
-			write(fd, msg, strlen(msg));
-		}
-	}
-	else {
-		const char *msg = "ERROR (Wrong password)\r\n";
-		write(fd, msg, strlen(msg));
-	}
+void makeString(char src[], int number){
+    int i, sample, len = 0, n;
+    n = number;
+    if (n == 0) {
+        src[len] = '0';
+        src[len + 1] = '\0';
+        return;
+    }
+    while (n != 0) {
+        len++;
+        n /= 10;
+    }
+    for (i = 0; i < len; i++) {
+        sample = number % 10;
+        number = number / 10;
+        src[len - (i + 1)] = sample + '0';
+    }
+    src[len] = '\0';
 }
 
-void IRCServer::getUsersInRoom(int fd, char * user, char * password, char * args) {
-	if(userlist_exists(usersList, user) == 1) { 
-		if(checkPassword(user, password) == 1) { 
-			if(roomlist_exists(roomsList, args) == 1) {
-				ListRoomNode * e;
-				e = roomsList->head;
-				while(e != NULL) {
-					if(strcmp(e->name, args) == 0) {
-						break;
-					}
-					e = e->next;
-				}
-				ListUserNode * u;
-				u = e->users_in_room->head;
-				while(u != NULL) {
-					char buffer[500];
-					sprintf(buffer, "%s\r\n", u->username);
-					const char *msg = buffer;
-					write(fd, msg, strlen(msg));
-					u = u->next;
-				}
-				write(fd, "\r\n", 2);
-			}
-		}
-		else {
-			const char *msg = "ERROR (Wrong password)\r\n";
-			write(fd, msg, strlen(msg));
-		}
-	}
-	else {
-		const char *msg = "ERROR (Wrong password)\r\n";
-		write(fd, msg, strlen(msg));
-	}
+void
+IRCServer::sendMessage(int fd, const char * user, const char * password, const char * args)
+{
+    
+    int tempRoomPos = 0;
+    int flag = 0;
+    int  i=0;
+    char * temp = (char *) malloc (1000 * sizeof(char));
+    if (checkPassword(fd, user, password)) {
+        std::string s_args(args);
+        std::string my_room=s_args.substr(0, s_args.find(" "));
+        string cMessage = s_args.substr(s_args.find(" ")+1);
+        currentMessage=cMessage.c_str();
+        
+        for (; i < roomCount; ++i) {
+            if (!strcmp(my_room.c_str(), RoomArray[i].roomName)) {
+                tempRoomPos = i;
+                flag = 1;
+                break;
+            }
+        }
+        
+        int bflag = 0;
+        for (int j = 0; j < RoomArray[tempRoomPos].userRoomCount; j++) {
+            if (!strcmp(RoomArray[tempRoomPos].users[j], user)) {
+                bflag = 1;
+                break;
+            }
+        }
+        if (bflag != 1) {
+            const char * msg = "ERROR (user not in room)\r\n";
+            write(fd, msg, strlen(msg));
+            return;
+        }
+    
+        
+        if (RoomArray[tempRoomPos].cMessCount < 100) {
+            string count = std::to_string(RoomArray[tempRoomPos].cMessCount);
+            std::string ret_message(count +" "+user+" " +currentMessage);
+             RoomArray[tempRoomPos].messages[RoomArray[tempRoomPos].cMessCount] = strdup(ret_message.c_str());
+            RoomArray[tempRoomPos].cMessCount++;
+            const char * msgs = "OK\r\n";
+            write(fd, msgs, strlen(msgs));
+        }
+    }else{
+        const char * msg = "ERROR (Wrong password)\r\n";
+        write(fd, msg, strlen(msg));
+    }
 }
 
-void IRCServer::getAllUsers(int fd, char * user, char * password, char * args) {
-	if(userlist_exists(usersList, user) == 1) { 
-		if(checkPassword(user, password) == 1) { 
-			ListUserNode *e;
-			e = usersList->head;
-			if(e != NULL) {
-				const char *msg;
-				while(e != NULL) {
-					write(fd, e->username, strlen(e->username));
-					write(fd, "\r\n", 2);
-					e = e->next;
-				}
-				write(fd, "\r\n", 2);
-			}
-		}
-		else {
-			const char *msg = "ERROR (Wrong password)\r\n";
-			write(fd, msg, strlen(msg));
-		}
-	}
-	else {
-		const char *msg = "ERROR (Wrong password)\r\n";
-		write(fd, msg, strlen(msg));
-	}
+void
+IRCServer::getMessages(int fd, const char * user, const char * password, const char * args)
+{
+    
+    //string roomname = s_args(s_args.find(" ")+1);
+    
+    int tempRoomPos;
+    int flag =0;
+    int bflag = 0;
+    int temp, i=0, j=0, k=0;
+    char * message = (char *) malloc (1000 * sizeof(char));
+    char * c;
+    
+    if (checkPassword(fd, user, password)) {
+        for ( i = 0; i < roomCount; i++) {
+            if (!strcmp(RoomArray[i].roomName, argsRoomName)) {
+                tempRoomPos = i;
+                printf("%d 12\n\n", i);
+                std::string s_args(args);
+                int num=stoi(s_args.substr(0, s_args.find(" ")));
+                temp = num;
+                flag = 0;
+                break;
+            }
+        }
+        for ( j = 0; j < RoomArray[tempRoomPos].userRoomCount; j++) {
+            if (!strcmp(RoomArray[tempRoomPos].users[j], user)) {
+                bflag = 1;
+                //printf("%d @\n\n", RoomArray[tempRoomPos].userRoomCount);
+                break;
+            }
+        }
+        if (flag == 0) {
+            if (bflag == 1) {
+                int cflag = 0;
+                for (j = temp+1; j < RoomArray[tempRoomPos].cMessCount; j++) {
+                    cflag = 1;
+                    strcpy(message, RoomArray[tempRoomPos].messages[j]);
+                    strcat(message, "\r\n");
+                    write(fd, message, strlen(message));
+                    printf("%s", message);
+                }
+                if (cflag == 0) {
+                    strcpy(message, "NO-NEW-MESSAGES\r\n");
+                    write(fd, message, strlen(message));
+                    return;
+                }
+                strcpy(message, "\r\n");
+                write (fd, message, strlen(message));
+            } else {
+                const char * msg = "ERROR (User not in room)\r\n";
+                write (fd, msg, strlen(msg));
+                return;
+            }
+        }
+    } else {
+        const char * msg = "ERROR (Wrong password)\r\n";
+        write(fd, msg, strlen(msg));
+    }
+    
 }
 
+void
+IRCServer::getUsersInRoom(int fd, const char * user, const char * password, const char * args)
+{
+    int tempRoomPos;
+    int flag = 0;
+    if (checkPassword(fd, user, password)) {
+        for (int i = 0; i < roomCount; i++) {
+            if (!strcmp(RoomArray[i].roomName, argsRoomName)) {
+                tempRoomPos = i;
+                flag = 1;
+                break;
+            }
+        }
+        if (flag != 1) {
+            return;
+        }
+        char * tempName = (char *) malloc (100 * sizeof(char));
+        for (int j = 0; j < RoomArray[tempRoomPos].userRoomCount - 1; j++) {
+            for (int k = j + 1; k < RoomArray[tempRoomPos].userRoomCount; k++) {
+                if (strcmp(RoomArray[tempRoomPos].users[j], RoomArray[tempRoomPos].users[k]) > 0) {
+                    tempName = strdup(RoomArray[tempRoomPos].users[j]);
+                    RoomArray[tempRoomPos].users[j] = strdup(RoomArray[tempRoomPos].users[k]);
+                    RoomArray[tempRoomPos].users[k] = strdup(tempName);
+                }
+            }
+        }
+        char * message = (char *) malloc (100 * sizeof(char));
+        for (int i = 0; i < RoomArray[tempRoomPos].userRoomCount; i++) {
+            strcpy(message, RoomArray[tempRoomPos].users[i]);
+            strcat(message, "\r\n");
+            write(fd, message, strlen(message));
+        }
+        strcpy(message, "\r\n");
+        write(fd, message, strlen(message));
+    } else {
+        const char * msg = "ERROR (Wrong password)\r\n";
+        write(fd, msg, strlen(msg));
+    }
+}
+
+void
+IRCServer::getAllUsers(int fd, const char * user, const char * password,const  char * args)
+{
+    char * temp = (char *)malloc(100 * sizeof(char));
+    char order[userCount+1][30];
+    if (checkPassword(fd, user, password)) {
+        for (int i=0; i<userCount; i++) {
+            for (int j=i+1; j<userCount; j++) {
+                if (strcmp(userArray[i].username, userArray[j].username)>=1) {
+                    temp =userArray[i].username;
+                    userArray[i].username=userArray[j].username;
+                    userArray[j].username=temp;
+                    temp =userArray[i].password;
+                    userArray[i].password=userArray[j].password;
+                    userArray[j].password=temp;
+                }
+            }
+        }
+        for (int i=0; i<userCount; i++) {
+            write(fd, userArray[i].username, strlen(userArray[i].username));
+            write(fd, "\r\n", 2);
+        }
+        write(fd, "\r\n", 2);
+        
+    } else {
+        const char * msg ="ERROR (Wrong password)\r\n";
+        write(fd, msg, strlen(msg));
+    }
+    
+}
