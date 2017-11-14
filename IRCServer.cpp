@@ -750,14 +750,14 @@ void IRCServer::getMessages(int fd, char * user, char * password, char * args) {
 						begin = (e->messageCounter % maxMessages)+lastMessageNum;
 						for(i = begin; i < maxMessages; i++, count++) {
 							char buffer[500];
-							sprintf(buffer, "%d %s %s\r\n", e->messageCounter - maxMessages + count + 1, e->m[i].username, e->m[i].message);
+							sprintf(buffer, "%d %s %s\r\n", e->messageCounter - maxMessages + count + 2, e->m[i+1].username, e->m[i+1].message);
 							const char *msg = buffer;
 							printf("%s\n", buffer);
 							write(fd, msg, strlen(msg));
 						}
 						for(i = 0; i < begin; i++) {
 							char buffer[500];
-							sprintf(buffer, "%d %s %s\r\n", e->messageCounter - maxMessages + count + i + 1, e->m[i].username, e->m[i].message);
+							sprintf(buffer, "%d %s %s\r\n", e->messageCounter - maxMessages + count + i + 2, e->m[i+1].username, e->m[i+1].message);
 							printf("%s\n", buffer);
 							const char *msg = buffer;
 							write(fd, msg, strlen(msg));
