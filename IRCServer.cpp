@@ -533,15 +533,15 @@ IRCServer::enterRoom(int fd, char * user, char * password, char * args)
 				write(fd, msg, strlen(msg));
 			}
 			else{
-				const char *msg = "OK\r\n";
+				const char *msg = "ERROR (No room)\r\n";
 				write(fd,msg,strlen(msg));
 			}
 		}else{
-			const char *msg = "OK\r\n";	
+			const char *msg = "ERROR (Wrong password)\r\n";	
 			write(fd, msg, strlen(msg));
 		}
 	}else{
-		const char *msg = "OK\r\n";
+		const char *msg = "ERROR (Wrong password)\r\n";
 		write(fd, msg, strlen(msg));
 	}
 }
