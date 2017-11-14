@@ -600,7 +600,117 @@ IRCServer::leaveRoom(int fd, char * user, char * password, char * args)
 void
 IRCServer::sendMessage(int fd, char * user, char * password, char * args)
 {
-	
+	if(userlist_exists(usersList, user) == 1) { // If user exists
+		if(checkPassword(user, password) == 1) { // If password is correct
+			if(roomlist_exists(roomsList, args) == 1) {
+				int user_entered_room = 0;
+				//printf("room exists!\n");
+				ListRoomNode * e;
+				e = roomsList->head;
+				while(e != NULL) {
+					if(strcmp(e->name, args) == 0) {
+						break;
+					}
+					e = e->next;
+				}
+				ListUserNode * u;
+				u = e->users_in_room->head;
+				const char *msg;
+				while(u != NULL) {
+					if(strcmp(u->username, user) == 0) {
+						user_entered_room = 1;
+						break;
+					}
+					u = u->next;	
+				}
+				if(user_entered_room == 1) {
+					if(userlist_remove(e->users_in_room, user) == 1) {
+						const char *msg = "OK\r\n";
+						write(fd, msg, strlen(msg));
+					}
+					else {
+						const char *msg = "DENIED\r\n";
+						write(fd, msg, strlen(msg));					
+					}
+				}
+				else {
+					const char *msg = "ERROR (No user in room)\r\n";
+					write(fd, msg, strlen(msg));
+				}
+			}
+			else {
+				const char *msg = "DENIED\r\n";
+				write(fd, msg, strlen(msg));
+			}
+		}
+		else {
+			const char *msg = "ERROR (Wrong password)\r\n";
+			write(fd, msg, strlen(msg));
+		}
+	}
+	else {
+		const char *msg = "ERROR (Wrong password)\r\n";
+		write(fd, msg, strlen(msg));
+	}
+}
+
+void IRCServer::sendMessage(int fd, char * user, char * password, char * args) {
+	if(userExists(userList, user) == 1) { // If user exists
+		if(checkPassword(user, password) == 1) { // If password is correct
+			char *splitted;
+			char *originalMessage;
+			char *roomName;
+			int roomNameLength = 0;
+			int entireMessageLength = 0;
+			int realMessageLength = 0;
+			originalMessage = strdup(args);
+			entireMessageLength = strlen(args);
+			roomName = strtok (args," ");
+			printf("%s\n", roomName);
+		  	roomNameLength = strlen(roomName);	  	
+		  	realMessageLength = entireMessageLength - roomNameLength;
+		  	if(roomExists(roomList, roomName) == 1) { 
+				RoomNode * n;
+				n = roomList->head;
+				while(n != NULL) {
+					if(strcmp(n->name, roomName) == 0) {
+						break;
+					}
+					n = n->next;
+				}
+				if(userExists(n->users_in_room, user) == 1) {
+					originalMessage += strlen(roomName) + 1;
+					if(n->messageCounter >= maxMessages) {
+						n->m[n->messageCounter % maxMessages].message = strdup(originalMessage);
+						n->m[n->messageCounter % maxMessages].username = strdup(user);
+					}
+					else {
+						n->m[n->messageCounter].message = strdup(originalMessage);
+						n->m[n->messageCounter].username = strdup(user);
+					}
+					n->messageCounter = n->messageCounter + 1;
+					const char *msg = "OK\r\n";
+					write(fd, msg, strlen(msg));				
+				}
+			  	else {
+					const char *msg = "ERROR (user not in room)\r\n";
+					write(fd, msg, strlen(msg));
+				}				
+		  	}
+		  	else {
+				const char *msg = "DENIED\r\n";
+				write(fd, msg, strlen(msg));
+			}
+		}
+		else {
+			const char *msg = "ERROR (Wrong password)\r\n";
+			write(fd, msg, strlen(msg));
+		}
+	}
+	else {
+		const char *msg = "ERROR (Wrong password)\r\n";
+		write(fd, msg, strlen(msg));
+	}	
 }
 
 void
