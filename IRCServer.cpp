@@ -576,23 +576,23 @@ IRCServer::leaveRoom(int fd, char * user, char * password, char * args)
 						const char *msg = "OK\r\n";
 						write(fd, msg, strlen(msg));
 					}else{
-						const char *msg = "OK\r\n";
+						const char *msg = "DENIED\r\n";
 						write(fd, msg, strlen(msg));
 					}
 				}else{
-					const char *msg = "OK\r\n";	
+					const char *msg = "ERROR (No user in room)\r\n";	
 					write(fd, msg, strlen(msg));
 				}
 			}else{
-				const char *msg = "OK\r\n";
+				const char *msg = "DENIED\r\n";
 				write(fd, msg, strlen(msg));
 			}
 		}else{
-			const char *msg = "OK\r\n";
+			const char *msg = "ERROR (Wrong password)\r\n";
 			write(fd, msg, strlen(msg));
 		}
 	}else{
-		const char *msg = "OK\r\n";
+		const char *msg = "ERROR (Wrong password)\r\n";
 		write(fd, msg, strlen(msg));
 	}
 }
