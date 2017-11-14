@@ -795,11 +795,11 @@ IRCServer::getAllUsers(int fd, char * user, char * password, char * args)
 				write(fd, "\r\n", 2);
 			}
 		}else{
-			const char *msg = "OK\r\n";
+			const char *msg = "ERROR (Wrong password)\r\n";
 			write(fd, msg, strlen(msg));
 		}
 	}else{
-		const char *msg = "OK\r\n";
+		const char *msg = "ERROR (Wrong password)\r\n";
 		write(fd, msg, strlen(msg));
 	}
 }
