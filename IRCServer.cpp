@@ -426,16 +426,7 @@ IRCServer::processRequest( int fd )
 	unsigned char prevChar = 0;
 	unsigned char newChar = 0;
 	
-	//
-	// The client should send COMMAND-LINE\n
-	// Read the name of the client character by character until a
-	// \n is found.
-	//
-
-	// Read character by character until a \n is found or the command string is full.
-	while ( commandLineLength < MaxCommandLine &&
-		read( fd, &newChar, 1) > 0 ) {
-
+	while(commandLineLength < MaxCommandLine && read( fd, &newChar, 1) > 0){
 		if (newChar == '\n' && prevChar == '\r') {
 			break;
 		}
@@ -468,53 +459,6 @@ IRCServer::processRequest( int fd )
 	user = strtok (NULL, " ");
 	password = strtok (NULL, " ");
 	args = strtok (NULL, "\n");
-
-	// int args_flag;
-	// char *temp_ptr = command;
-	// while(*temp_commandLine != ' ') {
-	// 	*command = *temp_commandLine;
-	// 	command++;
-	// 	temp_commandLine++;
-	// }
-	// command = temp_ptr;
-	// printf("%s\n", command);
-	// temp_commandLine++;
-	// temp_ptr = user;
-	// while(*temp_commandLine != ' ') {
-	// 	*user = *temp_commandLine;
-	// 	user++;
-	// 	temp_commandLine++;
-	// }
-	// user = temp_ptr;
-
-	// temp_commandLine++;
-	// temp_ptr = password;
-	// while(*temp_commandLine) {
-	// 	if(*temp_commandLine == ' ') {
-	// 		args_flag = 1;
-	// 		*temp_commandLine++;
-	// 		break;
-	// 	}
-	// 	*password = *temp_commandLine;
-	// 	password++;
-	// 	temp_commandLine++;
-	// }
-	// password = temp_ptr;
-
-	// if(args_flag) {
-	// 	temp_ptr = args;
-	// 	while(*temp_commandLine) {
-	// 		*args = *temp_commandLine;
-	// 		args++;
-	// 		temp_commandLine++;
-	// 	}
-	// 	args = temp_ptr;
-	// }
-
-	// printf("command=%s\n", command);
-	// printf("user=%s\n", user);
-	// printf( "password=%s\n", password );
-	// printf("args=%s\n", args);
 
 	if (!strcmp(command, "ADD-USER")) {
 		addUser(fd, user, password, args);
