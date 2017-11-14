@@ -1,4 +1,4 @@
-fndef IRC_SERVER
+#ifndef IRC_SERVER
 #define IRC_SERVER
 
 #define PASSWORD_FILE "password.txt"
