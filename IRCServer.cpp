@@ -659,6 +659,7 @@ void IRCServer::sendMessage(int fd, char * user, char * password, char * args) {
 void
 IRCServer::getMessages(int fd, char * user, char * password, char * args)
 {
+	
 }
 
 void
