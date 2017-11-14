@@ -23,7 +23,7 @@ public:
 	void getAllUsers(int fd, char * user, char * password, char * args);
 	void runServer(int port);
 };
-truct MessageContainer {
+struct MessageContainer {
 	char *message;
 	char *username;
 };
@@ -72,5 +72,5 @@ typedef struct RoomList RoomList;
 
 void roomlist_init(RoomList * list);
 void roomlist_add(RoomList * list, char *name);
-void roomlist_exists(ROomList * list, char *name);
+void roomlist_exists(RoomList * list, char *name);
 #endif
