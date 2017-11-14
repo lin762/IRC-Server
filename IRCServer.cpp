@@ -1,5 +1,4 @@
-
-const char * usage =
+t char * usage =
 "                                                               \n"
 "IRCServer:                                                   \n"
 "                                                               \n"
@@ -29,18 +28,45 @@ const char * usage =
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
-
 #include "IRCServer.h"
 
-int QueueLength = 5;
-
-//test
+/**
+	UserList.c
+**/
 
 void userlist_init(UserList * list)
 {
 	list->head = NULL;
 }
 
+//
+// It prints the elements in the list in the form:
+// 4, 6, 2, 3, 8,7
+//
+void userlist_print(UserList * list) {
+	
+	ListUserNode * e;
+
+	if (list->head == NULL) {
+		printf("{EMPTY}\n");
+		return;
+	}
+
+	printf("{");
+
+	e = list->head;
+	while (e != NULL) {
+		printf("%d", e->value);
+		e = e->next;
+		if (e!=NULL) {
+			printf(", ");
+		}
+	}
+	printf("}\n");
+}
+//
+// Appends a new node with this value at the beginning of the list
+//
 void userlist_add(UserList * list, char *user, char *password, int writeToFile) {
 	// Create new node
 	ListUserNode * n = (ListUserNode *) malloc(sizeof(ListUserNode));
@@ -66,6 +92,9 @@ void userlist_add(UserList * list, char *user, char *password, int writeToFile) 
 	userlist_sort(list);
 }
 
+//
+// Returns true if the value exists in the list.
+//
 int userlist_exists(UserList * list, char *user) {
 	ListUserNode * e;
 	e = list->head;
@@ -79,6 +108,9 @@ int userlist_exists(UserList * list, char *user) {
 	return 0;
 }
 
+//
+// It removes the entry with that value in the list.
+//
 int userlist_remove(UserList * list, char *username) {
 	ListUserNode * e;
 	e = list->head;
@@ -94,6 +126,62 @@ int userlist_remove(UserList * list, char *username) {
 		e = e->next;
 	}
 	return 0;
+}
+
+
+//
+// It returns the number of elements in the list.
+//
+int userlist_number_elements(UserList * list) {
+	ListUserNode * e;
+	e = list->head;
+	int counter;
+	counter = 0;
+	while(e != NULL) {
+		counter++;
+		e = e->next;
+	}
+	return counter;
+}
+
+
+//
+// It saves the list in a file called file_name. The format of the
+// file is as follows:
+//
+// value1\n
+// value2\n
+// ...
+//
+int userlist_save(UserList * list, char * file_name) {
+	ListUserNode *e;
+	e = list->head;
+	FILE *fptr;
+	fptr = fopen(file_name, "w");
+	if(fptr == NULL) {
+		//printf("A");
+		return 0;
+	}
+	while(e != NULL) {
+		fprintf(fptr, "%d\n",e->value);
+	 	e = e->next;
+	}
+	fclose(fptr);
+	return 0;
+}
+//
+// Clear all elements in the list and free the nodes
+//
+void userlist_clear(UserList *list)
+{
+	ListUserNode *e = list->head;
+	ListUserNode *temp;
+	while(e != NULL) {
+		temp = e->next;
+		free(e);
+		e = temp;
+	}
+	list->head = NULL;
 }
 
 void userlist_sort(UserList * list) {
@@ -138,12 +226,16 @@ void userlist_sort(UserList * list) {
 	}
 }
 
+/* END USERLIST */
 void roomlist_init(RoomList * list)
 {
 	list->head = NULL;
 }
-
+//
+// Appends a new node with this value at the beginning of the list
+//
 void roomlist_add(RoomList * list, char *name) {
+	// Create new node
 	ListRoomNode * n = (ListRoomNode *) malloc(sizeof(ListRoomNode));
 	UserList *ulist = (UserList*)malloc(sizeof(UserList));
 	userlist_init(ulist);
@@ -154,7 +246,9 @@ void roomlist_add(RoomList * list, char *name) {
 	n->next = list->head;
 	list->head = n;
 }
-
+//
+// Returns true if the value exists in the list.
+//
 int roomlist_exists(RoomList * list, char *name) {
 	ListRoomNode * e;
 	e = list->head;
@@ -166,6 +260,25 @@ int roomlist_exists(RoomList * list, char *name) {
 	}
 	return 0;
 }
+ListRoomNode* roomlist_get_ith(RoomList * list, int ith) {
+	ListRoomNode * e;
+	int counter;
+	counter = 0;
+	e = list->head;
+	while(e != NULL) {
+		if(counter == ith) {
+			return e;
+		}
+		counter++;
+		e = e->next;
+	}
+}
+
+/**
+	END ROOMLIST
+**/
+
+int QueueLength = 5;
 
 int
 IRCServer::open_server_socket(int port) {
@@ -305,7 +418,7 @@ IRCServer::processRequest( int fd )
 {
 	// Buffer used to store the comand received from the client
 	const int MaxCommandLine = 1024;
-	char commandLine[ MaxCommandLine + 1 ];
+	char *commandLine = (char*)malloc(sizeof(char) * (MaxCommandLine + 1));
 	int commandLineLength = 0;
 	int n;
 	
@@ -338,28 +451,79 @@ IRCServer::processRequest( int fd )
 	commandLineLength--;
         commandLine[ commandLineLength ] = 0;
 
-	printf("RECEIVED: %s\n", commandLine);
+	//printf("RECEIVED: %s\n", commandLine);
 
-	printf("The commandLine has the following format:\n");
-	printf("COMMAND <user> <password> <arguments>. See below.\n");
-	printf("You need to separate the commandLine into those components\n");
-	printf("For now, command, user, and password are hardwired.\n");
+	// printf("The commandLine has the following format:\n");
+	// printf("COMMAND <user> <password> <arguments>. See below.\n");
+	// printf("You need to separate the commandLine into those components\n");
+	// printf("For now, command, user, and password are hardwired.\n");
 
-	char * command = "ADD-USER";
-	char * user = "peter";
-	char * password = "spider";
-	char * args = "";
+	char *temp_commandLine = commandLine;
+	char *command = (char*)malloc(sizeof(char) * 100);
+	char *user = (char*)malloc(sizeof(char) * 100);
+	char *password = (char*)malloc(sizeof(char) * 100);
+	char *args = (char*)malloc(sizeof(char) * 100);
 
-	printf("command=%s\n", command);
-	printf("user=%s\n", user);
-	printf( "password=%s\n", password );
-	printf("args=%s\n", args);
+	command = strtok (commandLine," ");
+	user = strtok (NULL, " ");
+	password = strtok (NULL, " ");
+	args = strtok (NULL, "\n");
+
+	// int args_flag;
+	// char *temp_ptr = command;
+	// while(*temp_commandLine != ' ') {
+	// 	*command = *temp_commandLine;
+	// 	command++;
+	// 	temp_commandLine++;
+	// }
+	// command = temp_ptr;
+	// printf("%s\n", command);
+	// temp_commandLine++;
+	// temp_ptr = user;
+	// while(*temp_commandLine != ' ') {
+	// 	*user = *temp_commandLine;
+	// 	user++;
+	// 	temp_commandLine++;
+	// }
+	// user = temp_ptr;
+
+	// temp_commandLine++;
+	// temp_ptr = password;
+	// while(*temp_commandLine) {
+	// 	if(*temp_commandLine == ' ') {
+	// 		args_flag = 1;
+	// 		*temp_commandLine++;
+	// 		break;
+	// 	}
+	// 	*password = *temp_commandLine;
+	// 	password++;
+	// 	temp_commandLine++;
+	// }
+	// password = temp_ptr;
+
+	// if(args_flag) {
+	// 	temp_ptr = args;
+	// 	while(*temp_commandLine) {
+	// 		*args = *temp_commandLine;
+	// 		args++;
+	// 		temp_commandLine++;
+	// 	}
+	// 	args = temp_ptr;
+	// }
+
+	// printf("command=%s\n", command);
+	// printf("user=%s\n", user);
+	// printf( "password=%s\n", password );
+	// printf("args=%s\n", args);
 
 	if (!strcmp(command, "ADD-USER")) {
 		addUser(fd, user, password, args);
 	}
 	else if (!strcmp(command, "ENTER-ROOM")) {
 		enterRoom(fd, user, password, args);
+	}
+	else if (!strcmp(command, "CREATE-ROOM")) {
+		createRoom(fd, user, password, args);
 	}
 	else if (!strcmp(command, "LEAVE-ROOM")) {
 		leaveRoom(fd, user, password, args);
@@ -373,9 +537,15 @@ IRCServer::processRequest( int fd )
 	else if (!strcmp(command, "GET-USERS-IN-ROOM")) {
 		getUsersInRoom(fd, user, password, args);
 	}
+	else if (!strcmp(command, "LIST-ROOMS")) {
+		listRooms(fd, user, password, args);
+	}
 	else if (!strcmp(command, "GET-ALL-USERS")) {
 		getAllUsers(fd, user, password, args);
 	}
+	else if (!strcmp(command, "CHECK-AUTH")) {
+		checkAuth(fd, user, password, args);
+	}	
 	else {
 		const char * msg =  "UNKNOWN COMMAND\r\n";
 		write(fd, msg, strlen(msg));
@@ -387,7 +557,6 @@ IRCServer::processRequest( int fd )
 
 	close(fd);	
 }
-
 UserList *usersList;
 RoomList * roomsList;
 int maxMessages = 100;
@@ -443,12 +612,31 @@ IRCServer::addUser(int fd, char * user, char * password, char * args)
 {
 	if(userlist_exists(usersList, user) == 0) {
 		userlist_add(usersList, user, password, 1);
-		//printf("~%d~\n", userlist_number_elements(usersList));
 		const char * msg =  "OK\r\n";
 		write(fd, msg, strlen(msg));
 	}
 	else {
-		const char * msg =  "OK\r\n";
+		const char * msg =  "DENIED\r\n";
+		write(fd, msg, strlen(msg));
+	}
+	return;		
+}
+
+void
+IRCServer::checkAuth(int fd, char * user, char * password, char * args)
+{
+	if(userlist_exists(usersList, user) == 1) {
+		if(checkPassword(user, password) == 1) {
+			const char * msg =  "OK\r\n";
+			write(fd, msg, strlen(msg));
+		}
+		else {
+			const char * msg =  "NO\r\n";
+			write(fd, msg, strlen(msg));
+		}
+	}
+	else {
+		const char * msg =  "NO\r\n";
 		write(fd, msg, strlen(msg));
 	}
 	return;		
@@ -458,7 +646,6 @@ void IRCServer::enterRoom(int fd, char * user, char * password, char * args) {
 	if(userlist_exists(usersList, user) == 1) { // If user exists
 		if(checkPassword(user, password) == 1) { // If password is correct
 			if(roomlist_exists(roomsList, args) == 1) {
-				//printf("room exists!\n");
 				ListRoomNode * e;
 				e = roomsList->head;
 				while(e != NULL) {
@@ -495,7 +682,6 @@ void IRCServer::leaveRoom(int fd, char * user, char * password, char * args) {
 		if(checkPassword(user, password) == 1) { // If password is correct
 			if(roomlist_exists(roomsList, args) == 1) {
 				int user_entered_room = 0;
-				//printf("room exists!\n");
 				ListRoomNode * e;
 				e = roomsList->head;
 				while(e != NULL) {
@@ -558,14 +744,9 @@ void IRCServer::sendMessage(int fd, char * user, char * password, char * args) {
 			entireMessageLength = strlen(args);
 			roomName = strtok (args," ");
 			printf("%s\n", roomName);
-		  	// while (splitted != NULL) {
-		  	// 	roomName = strdup(splitted);
-		   //  	splitted = strtok (NULL, " ");
-		  	// }
 		  	roomNameLength = strlen(roomName);	  	
 		  	realMessageLength = entireMessageLength - roomNameLength;
 		  	if(roomlist_exists(roomsList, roomName) == 1) { // room exists
-		  		// Get pointer to the room
 				ListRoomNode * e;
 				e = roomsList->head;
 				while(e != NULL) {
@@ -575,18 +756,14 @@ void IRCServer::sendMessage(int fd, char * user, char * password, char * args) {
 					e = e->next;
 				}
 				if(userlist_exists(e->users_in_room, user) == 1) {
-					// Clip original message to remove the name of the room (and the extra space)
 					originalMessage += strlen(roomName) + 1;
 					if(e->messageCounter >= maxMessages) {
 						e->m[e->messageCounter % maxMessages].message = strdup(originalMessage);
 						e->m[e->messageCounter % maxMessages].username = strdup(user);
-						//printf("(%d) %s: %s\n", e->messageCounter, e->m[e->messageCounter % maxMessages].username, e->m[e->messageCounter - maxMessages].message);
 					}
 					else {
-						// Set the username and message in the MessageContainer
 						e->m[e->messageCounter].message = strdup(originalMessage);
 						e->m[e->messageCounter].username = strdup(user);
-						//printf("(~%d) %s: %s\n", e->messageCounter, e->m[e->messageCounter].username, e->m[e->messageCounter].message);
 					}
 					e->messageCounter = e->messageCounter + 1;
 					const char *msg = "OK\r\n";
@@ -614,8 +791,8 @@ void IRCServer::sendMessage(int fd, char * user, char * password, char * args) {
 }
 
 void IRCServer::getMessages(int fd, char * user, char * password, char * args) {
-	if(userlist_exists(usersList, user) == 1) { // If user exists
-		if(checkPassword(user, password) == 1) { // If password is correct
+	if(userlist_exists(usersList, user) == 1) { 
+		if(checkPassword(user, password) == 1) { 
 			char *splitted;
 			char *temp_num;
 			int lastMessageNum;
@@ -627,10 +804,8 @@ void IRCServer::getMessages(int fd, char * user, char * password, char * args) {
 			roomName = strdup(splitted);
 			int count;
 			count = 0;
-			//printf("%d, %s\n", lastMessageNum, roomName);
 			
-			if(roomlist_exists(roomsList, roomName) == 1) { // room exists
-		  		// Get pointer to the room
+			if(roomlist_exists(roomsList, roomName) == 1) {
 				ListRoomNode * e;
 				e = roomsList->head;
 				while(e != NULL) {
@@ -651,7 +826,6 @@ void IRCServer::getMessages(int fd, char * user, char * password, char * args) {
 						return;
 					}
 					if(e->messageCounter >= maxMessages) {
-						//printf("Total Messages: %d, maxMessages: %d\n", e->messageCounter, maxMessages);
 						int begin;
 						begin = (e->messageCounter % maxMessages)+lastMessageNum;
 						for(i = begin; i < maxMessages; i++, count++) {
@@ -702,11 +876,9 @@ void IRCServer::getMessages(int fd, char * user, char * password, char * args) {
 }
 
 void IRCServer::getUsersInRoom(int fd, char * user, char * password, char * args) {
-	if(userlist_exists(usersList, user) == 1) { // If user exists
-		if(checkPassword(user, password) == 1) { // If password is correct
+	if(userlist_exists(usersList, user) == 1) { 
+		if(checkPassword(user, password) == 1) { 
 			if(roomlist_exists(roomsList, args) == 1) {
-				// int i = 0;
-				//printf("room exists!\n");
 				ListRoomNode * e;
 				e = roomsList->head;
 				while(e != NULL) {
@@ -723,7 +895,6 @@ void IRCServer::getUsersInRoom(int fd, char * user, char * password, char * args
 					const char *msg = buffer;
 					write(fd, msg, strlen(msg));
 					u = u->next;
-					// i++;
 				}
 				write(fd, "\r\n", 2);
 			}
@@ -740,18 +911,13 @@ void IRCServer::getUsersInRoom(int fd, char * user, char * password, char * args
 }
 
 void IRCServer::getAllUsers(int fd, char * user, char * password, char * args) {
-	if(userlist_exists(usersList, user) == 1) { // If user exists
-		//printf("user exists\n");
-		if(checkPassword(user, password) == 1) { // If password is correct
-			//printf("password is right!\n");
+	if(userlist_exists(usersList, user) == 1) { 
+		if(checkPassword(user, password) == 1) { 
 			ListUserNode *e;
 			e = usersList->head;
 			if(e != NULL) {
-				//printf("head is not null!\n");
 				const char *msg;
 				while(e != NULL) {
-					// printf("found user\n");
-					// printf("%s\n", e->username);
 					write(fd, e->username, strlen(e->username));
 					write(fd, "\r\n", 2);
 					e = e->next;
@@ -770,3 +936,51 @@ void IRCServer::getAllUsers(int fd, char * user, char * password, char * args) {
 	}
 }
 
+void IRCServer::listRooms(int fd, char * user, char * password, char * args) {
+	if(userlist_exists(usersList, user) == 1) { 
+		if(checkPassword(user, password) == 1) { 
+			ListRoomNode *e;
+			e = roomsList->head;
+			if(e != NULL){
+				const char *msg;
+				while(e != NULL) {
+					write(fd, e->name, strlen(e->name));
+					write(fd, "\r\n", 2);
+					e = e->next;
+				}
+			}
+		}
+		else {
+			const char *msg = "ERROR (Wrong password)\r\n";
+			write(fd, msg, strlen(msg));
+		}
+	}
+	else {
+		const char *msg = "DENIED\r\n";
+		write(fd, msg, strlen(msg));
+	}
+}
+
+void IRCServer::createRoom(int fd, char * user, char * password, char * args){
+	if(userlist_exists(usersList, user) == 1) {
+		if(checkPassword(user, password) == 1) { 
+			if(roomlist_exists(roomsList, args) == 0) { 
+				roomlist_add(roomsList, args); 
+				const char *msg = "OK\r\n";
+				write(fd, msg, strlen(msg));
+			}
+			else {
+				const char *msg = "DENIED\r\n";
+				write(fd, msg, strlen(msg));
+			}			
+		}
+		else {
+			const char *msg = "ERROR (Wrong password)\r\n";
+			write(fd, msg, strlen(msg));
+		}
+	}
+	else {
+		const char *msg = "DENIED\r\n";
+		write(fd, msg, strlen(msg));
+	}
+}
