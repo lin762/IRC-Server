@@ -23,63 +23,53 @@ public:
 	void getAllUsers(int fd, char * user, char * password, char * args);
 	void runServer(int port);
 };
-
-//data structure to store messages
-struct MessageArray{
+truct MessageContainer {
 	char *message;
 	char *username;
 };
 
-typedef struct MessageArray MessageArray;
+typedef struct MessageContainer MessageContainer;
 
-//data structure for list of users
-struct UserNode{
+/**
+	User List
+**/
+struct ListUserNode {
 	int value;
 	char *username;
 	char *password;
-	struct UserNode *next;
+	struct ListUserNode * next;
 };
 
-typedef struct UserNode UserNode;
+typedef struct ListUserNode ListUserNode;
 
-struct UserList{
-	UserNode *head;
+struct UserList {
+	ListUserNode * head;
 };
 
 typedef struct UserList UserList;
 
-void initUserList(UserList *list);
-void printUserList(UserList *list);
-void addUserList(UserList *list, char *username, char *password, int writeFile);
-int userExists(UserList *list, char *username);
-int userRemove(UserList *list, char *username);
-int numOfUsers(UserList *list);
-int saveUserList(UserList *list, char *file_name);
-void clearUsers(UserList *list);
-void sortUserList(UserList *list);
+void userlist_init(UserList * list);
+void userlist_add(UserList * list, char *username, char *password, int writeToFile);
+int userlist_exists(UserList * list, char *username);
+int userlist_remove(UserList * list, char *username);
+void userlist_sort(UserList *list);
 
-//data structure for list of rooms
-struct RoomNode{
+struct ListRoomNode {
 	char *name;
-	int messageCounter;
-	MessageArray m[100];
-	UserList *users;
-	struct RoomNode *next;
+	int messageCounter;	
+	MessageContainer m[100];
+	UserList *users_in_room;
+	struct ListRoomNode * next;
 };
 
-typedef struct RoomNode RoomNode;
+typedef struct ListRoomNode ListRoomNode;
 
-struct RoomList{
-	RoomNode *head;
+struct RoomList {
+	ListRoomNode * head;
 };
 
 typedef struct RoomList RoomList;
 
-void initRoomList(RoomList *list);
-void printRoomList(RoomList *list);
-void addRoom(RoomList *list, char *name);
-RoomNode *getIthRoom(RoomList *list, int i);
-int roomExists(RoomList *list, char *name);
-int roomRemove(RoomList *list, char *name);
-void clearRoom(RoomList *list);
-#endif
+void roomlist_init(RoomList * list);
+void roomlist_add(RoomList * list, char *name);
+void roomlist_exists(ROomList * list, char *name);
