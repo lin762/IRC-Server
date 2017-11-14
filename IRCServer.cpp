@@ -464,7 +464,7 @@ IRCServer::initialize()
 	roomList = (RoomList*)malloc(sizeof(RoomList));
 	initRoomList(roomList);
 	
-	FILE*fd = fopen("password.txt", "w");
+	FILE*fd = fopen("password.txt", "r");
 	char fileuser[100];
 	char filepassword[100];
 	if(fd == NULL){
