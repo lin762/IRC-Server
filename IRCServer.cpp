@@ -599,7 +599,7 @@ IRCServer::leaveRoom(int fd, char * user, char * password, char * args)
 
 void IRCServer::sendMessage(int fd, char * user, char * password, char * args) {
 	if(userExists(userList, user) == 1) { // If user exists
-		if(checkPassword(user, password) == 1) { // If password is correct
+		if(checkPassword(fd, user, password) == 1) { // If password is correct
 			char *splitted;
 			char *originalMessage;
 			char *roomName;
@@ -621,7 +621,7 @@ void IRCServer::sendMessage(int fd, char * user, char * password, char * args) {
 					}
 					n = n->next;
 				}
-				if(userExists(n->users_in_room, user) == 1) {
+				if(userExists(n->users, user) == 1) {
 					originalMessage += strlen(roomName) + 1;
 					if(n->messageCounter >= maxMessages) {
 						n->m[n->messageCounter % maxMessages].message = strdup(originalMessage);
