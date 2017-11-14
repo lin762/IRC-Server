@@ -614,7 +614,7 @@ IRCServer::getUsersInRoom(int fd, char * user, char * password, char * args)
 	if(userExists(userList, user) == 1){
 		if(checkPassword(fd, user, password) == 1){
 			if(roomExists(roomList, args) == 1){
-				RoomNOde *n;
+				RoomNode *n;
 				n = roomList -> head;
 				while(n != NULL){
 					if(strcmp(n -> name, args) == 0){
