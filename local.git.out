@@ -16,3 +16,20 @@ After doing this, you may fix the identity used for this commit with:
  rewrite IRCServer.cpp (85%)
  rewrite IRCServer.h (88%)
  rewrite total.txt (100%)
+[master 404c6e7] Lab10
+ Committer: Christopher Simon Lin <lin762@data.cs.purdue.edu>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 3 files changed, 1031 insertions(+), 782 deletions(-)
+ rewrite IRCServer.cpp (86%)
+ rewrite IRCServer.h (75%)
