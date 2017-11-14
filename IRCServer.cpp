@@ -611,6 +611,36 @@ IRCServer::getMessages(int fd, char * user, char * password, char * args)
 void
 IRCServer::getUsersInRoom(int fd, char * user, char * password, char * args)
 {
+	if(userExists(userList, user) == 1){
+		if(checkPassword(fd, user, password) == 1){
+			if(roomExists(roomList, args) == 1){
+				RoomNOde *n;
+				n = roomList -> head;
+				while(n != NULL){
+					if(strcmp(n -> name, args) == 0){
+						break;
+					}
+					n = n -> next;
+				}
+				UserNode *u;
+				u = n -> users -> head;
+				while(u != NULL){
+					char buffer[500];
+					sprintf(buffer, "%s\r\n", u -> username);
+					const char *msg = buffer;
+					write(fd, msg, strlen(msg));
+					u = u -> next;
+				}
+				write(fd, "\r\n", 2);
+			}
+		}else{
+			const char *msg = "ERROR (Wrong password)\r\n";
+			write(fd, msg, strlen(msg));
+		}
+	}else{
+		const char *msg = "ERROR (Wrong password)\r\n";
+		write(fd, msg, strlen(msg));
+	}
 }
 
 void
