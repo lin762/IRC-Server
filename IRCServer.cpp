@@ -614,24 +614,24 @@ void IRCServer::sendMessage(int fd, char * user, char * password, char * args) {
 		  	realMessageLength = entireMessageLength - roomNameLength;
 		  	if(roomExists(roomList, roomName) == 1) { 
 				RoomNode * n;
-				n = roomList->head;
+				n = roomList -> head;
 				while(n != NULL) {
-					if(strcmp(n->name, roomName) == 0) {
+					if(strcmp(n -> name, roomName) == 0) {
 						break;
 					}
-					n = n->next;
+					n = n -> next;
 				}
-				if(userExists(n->users, user) == 1) {
+				if(userExists(n -> users, user) == 1) {
 					originalMessage += strlen(roomName) + 1;
-					if(n->messageCounter >= maxMessages) {
-						n->m[n->messageCounter % maxMessages].message = strdup(originalMessage);
-						n->m[n->messageCounter % maxMessages].username = strdup(user);
+					if(n -> messageCounter >= maxMessages) {
+						n -> m[n->messageCounter % maxMessages].message = strdup(originalMessage);
+						n -> m[n->messageCounter % maxMessages].username = strdup(user);
 					}
 					else {
-						n->m[n->messageCounter].message = strdup(originalMessage);
-						n->m[n->messageCounter].username = strdup(user);
+						n -> m[n->messageCounter].message = strdup(originalMessage);
+						n -> m[n->messageCounter].username = strdup(user);
 					}
-					n->messageCounter = n->messageCounter + 1;
+					n -> messageCounter = n -> messageCounter + 1;
 					const char *msg = "OK\r\n";
 					write(fd, msg, strlen(msg));				
 				}
@@ -659,7 +659,88 @@ void IRCServer::sendMessage(int fd, char * user, char * password, char * args) {
 void
 IRCServer::getMessages(int fd, char * user, char * password, char * args)
 {
-	
+	if(userExists(userList, user) == 1) { 
+		if(checkPassword(fd, user, password) == 1) { 
+			char *splitted;
+			char *temp_num;
+			int lastMessageNum;
+			char *roomName;
+			splitted = strtok (args," ");
+			temp_num = strdup(splitted);
+			lastMessageNum = atoi(temp_num);
+			splitted = strtok (NULL, " ");
+			roomName = strdup(splitted);
+			int count;
+			count = 0;
+			
+			if(roomExists(roomList, roomName) == 1) {
+				RoomNode * n;
+				n = roomList -> head;
+				while(n != NULL) {
+					if(strcmp(n -> name, roomName) == 0) {
+						break;
+					}
+					n = n -> next;
+				}
+				if(userExists(n -> users, user) == 1) {
+					int i;
+					char *msg;
+					if(maxMessages < n -> messageCounter) {
+						lastMessageNum = 0;
+					}
+					if(lastMessageNum >= n -> messageCounter) {
+						const char *msg = "NO-NEW-MESSAGES\r\n";
+						write(fd, msg, strlen(msg));
+						return;
+					}
+					if(n -> messageCounter >= maxMessages) {
+						int begin;
+						begin = (n -> messageCounter % maxMessages)+lastMessageNum;
+						for(i = begin; i < maxMessages; i++, count++) {
+							char buffer[500];
+							sprintf(buffer, "%d %s %s\r\n", n -> messageCounter - maxMessages + count + 1, n -> m[i].username, n -> m[i].message);
+							const char *msg = buffer;
+							printf("%s\n", buffer);
+							write(fd, msg, strlen(msg));
+						}
+						for(i = 0; i < begin; i++) {
+							char buffer[500];
+							sprintf(buffer, "%d %s %s\r\n", n -> messageCounter - maxMessages + count + i + 1, n -> m[i].username, n -> m[i].message);
+							printf("%s\n", buffer);
+							const char *msg = buffer;
+							write(fd, msg, strlen(msg));
+						}					
+					}
+					else {
+						for(i = lastMessageNum; i < n -> messageCounter; i++) {
+							char buffer[500];
+							sprintf(buffer, "%d %s %s\r\n", i, n -> m[i].username, n -> m[i].message);
+							printf("%s\n", buffer);
+							const char *msg = buffer;
+							write(fd, msg, strlen(msg));
+						}
+					}
+					write(fd, "\r\n", 2);
+				}
+				else {
+					const char *msg = "ERROR (User not in room)\r\n";
+					write(fd, msg, strlen(msg));
+				}
+			}
+			else {
+				const char *msg = "DENIED\r\n";
+				write(fd, msg, strlen(msg));
+			}			
+		}
+		else {
+			const char *msg = "ERROR (Wrong password)\r\n";
+			write(fd, msg, strlen(msg));
+		}
+	}
+	else {
+		const char *msg = "ERROR (Wrong password)\r\n";
+		write(fd, msg, strlen(msg));
+	}	
 }
 
 void
