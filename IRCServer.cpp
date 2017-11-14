@@ -748,23 +748,23 @@ void IRCServer::getMessages(int fd, char * user, char * password, char * args) {
 						//printf("Total Messages: %d, maxMessages: %d\n", e->messageCounter, maxMessages);
 						int begin;
 						begin = (e->messageCounter % maxMessages)+lastMessageNum;
-						for(i = begin; i < maxMessages; i++, count++) {
+						for(i = begin + 1; i < maxMessages; i++, count++) {
 							char buffer[500];
-							sprintf(buffer, "%d %s %s\r\n", e->messageCounter - maxMessages + count + 2, e->m[i+1].username, e->m[i+1].message);
+							sprintf(buffer, "%d %s %s\r\n", e->messageCounter - maxMessages + count + 1, e->m[i].username, e->m[i].message);
 							const char *msg = buffer;
 							printf("%s\n", buffer);
 							write(fd, msg, strlen(msg));
 						}
-						for(i = 0; i < begin; i++) {
+						for(i = 0; i < begin + 1; i++) {
 							char buffer[500];
-							sprintf(buffer, "%d %s %s\r\n", e->messageCounter - maxMessages + count + i + 2, e->m[i+1].username, e->m[i+1].message);
+							sprintf(buffer, "%d %s %s\r\n", e->messageCounter - maxMessages + count + i + 1, e->m[i].username, e->m[i].message);
 							printf("%s\n", buffer);
 							const char *msg = buffer;
 							write(fd, msg, strlen(msg));
 						}					
 					}
 					else {
-						for(i = lastMessageNum; i < e->messageCounter; i++) {
+						for(i = lastMessageNum + 1; i < e->messageCounter; i++) {
 							char buffer[500];
 							sprintf(buffer, "%d %s %s\r\n", i, e->m[i].username, e->m[i].message);
 							printf("%s\n", buffer);
