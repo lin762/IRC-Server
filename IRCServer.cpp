@@ -448,7 +448,7 @@ IRCServer::addUser(int fd, char * user, char * password, char * args)
 		write(fd, msg, strlen(msg));
 	}
 	else {
-		const char * msg =  "DENIED\r\n";
+		const char * msg =  "OK\r\n";
 		write(fd, msg, strlen(msg));
 	}
 	return;		
