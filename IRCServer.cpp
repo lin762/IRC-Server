@@ -85,11 +85,11 @@ int userExists(UserList *list, char *username){
 	n = list -> head;
 	while(n != NULL){
 		if(strcmp(n -> username, username) == 0){
-			return 1;
+			return 0;
 		}
 		n = n -> next;
 	}
-	return 0;
+	return 1;
 }
 
 int userRemove(UserList *list, char *username){
