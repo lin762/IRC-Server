@@ -41,6 +41,132 @@ void userlist_init(UserList * list)
 	list->head = NULL;
 }
 
+void userlist_add(UserList * list, char *user, char *password, int writeToFile) {
+	// Create new node
+	ListUserNode * n = (ListUserNode *) malloc(sizeof(ListUserNode));
+	n->username = strdup(user);
+	n->password = strdup(password);
+	//printf("added user: %s with password: %s\n", n->username, n->password);
+	// Add at the beginning of the list
+	n->next = list->head;
+	list->head = n;
+
+	if(writeToFile) {
+		FILE *userFile;
+		userFile = fopen("password.txt", "w");
+		ListUserNode *e;
+		e = list->head;
+		while(e != NULL) {
+			fprintf(userFile, "%s %s\n", e->username, e->password);
+			//printf("password read: %s\n", e->password);
+			e = e->next;
+		}
+		fclose(userFile);
+	}
+	userlist_sort(list);
+}
+
+int userlist_exists(UserList * list, char *user) {
+	ListUserNode * e;
+	e = list->head;
+	while(e != NULL) {
+		//printf("%s | %s", e->username, user);
+		if(strcmp(e->username, user) == 0) {
+			return 1;
+		}
+		e = e->next;
+	}
+	return 0;
+}
+
+int userlist_remove(UserList * list, char *username) {
+	ListUserNode * e;
+	e = list->head;
+	if(strcmp(e->username, username) == 0) {
+		list->head = e->next;
+		return 1;
+	}
+	while(e->next != NULL) {
+		if(strcmp(e->next->username, username) == 0) {
+			e->next = e->next->next;
+			return 1;
+		}
+		e = e->next;
+	}
+	return 0;
+}
+
+void userlist_sort(UserList * list) {
+	ListUserNode *first;
+	ListUserNode *second;
+	int temp, flag;
+	first = list->head;
+	flag = 1;
+	second = first->next;
+	while(flag == 1) {
+		//llist_print(list);
+		flag = 0;
+		first = list->head;
+		second = first->next;
+		while(second != NULL) {
+			//printf("%d", first->value);
+			if(strcmp(first->username, second->username) > 0) {
+				char *temp_username;
+				char *temp_password;
+
+				temp = first->value;
+				first->value = second->value;
+				second->value = temp;
+
+				temp_username = strdup(first->username);
+				first->username = strdup(second->username);
+				second->username = strdup(temp_username);
+
+				temp_password = strdup(first->password);
+				first->password = strdup(second->password);
+				second->password = strdup(temp_password);
+
+				first = second->next;
+				flag = 1;
+				break;
+			}
+			else {
+				first = second;
+				second = second->next;
+			}
+		}
+	}
+}
+
+void roomlist_init(RoomList * list)
+{
+	list->head = NULL;
+}
+
+void roomlist_add(RoomList * list, char *name) {
+	ListRoomNode * n = (ListRoomNode *) malloc(sizeof(ListRoomNode));
+	UserList *ulist = (UserList*)malloc(sizeof(UserList));
+	userlist_init(ulist);
+	n->messageCounter = 0;
+	n->name = name;
+	n->users_in_room = ulist;
+	
+	n->next = list->head;
+	list->head = n;
+}
+
+int roomlist_exists(RoomList * list, char *name) {
+	ListRoomNode * e;
+	e = list->head;
+	while(e != NULL) {
+		if(strcmp(e->name, name) == 0) {
+			return 1;
+		}
+		e = e->next;
+	}
+	return 0;
+}
+
 int
 IRCServer::open_server_socket(int port) {
 
