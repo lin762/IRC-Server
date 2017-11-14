@@ -77,7 +77,7 @@ void addUserList(UserList *list, char *username, char *password, int writeFile){
 		}
 		fclose(fd);
 	}
-//	sortUserList(list);
+	sortUserList(list);
 }
 
 int userExists(UserList *list, char *username){
@@ -482,7 +482,13 @@ IRCServer::checkPassword(int fd, char * user, char * password) {
 	// Here check the password
 	UserNode *n;
 	n = userList -> head;
-	
+	if(strcmp(n -> username, user) == 0){
+		if(strcmp(n -> password, password) == 0){
+			return true;
+		}
+	}else{
+		return false;
+	}	
 	while(n != NULL){
 		if(strcmp(n -> username, user) == 0){
 			if(strcmp(n -> password, password) == 0){
