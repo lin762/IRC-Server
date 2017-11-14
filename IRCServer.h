@@ -72,5 +72,5 @@ typedef struct RoomList RoomList;
 
 void roomlist_init(RoomList * list);
 void roomlist_add(RoomList * list, char *name);
-void roomlist_exists(RoomList * list, char *name);
+int roomlist_exists(RoomList * list, char *name);
 #endif
