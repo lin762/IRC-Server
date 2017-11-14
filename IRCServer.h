@@ -20,7 +20,6 @@ public:
 	void getMessages(int fd, char * user, char * password, char * args);
 	void getUsersInRoom(int fd, char * user, char * password, char * args);
 	void getAllUsers(int fd, char * user, char * password, char * args);
-	void checkAuth(int fd, char * user, char * password, char * args);
 	void runServer(int port);
 };
 /**

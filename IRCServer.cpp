@@ -466,9 +466,6 @@ IRCServer::processRequest( int fd )
 	else if (!strcmp(command, "ENTER-ROOM")) {
 		enterRoom(fd, user, password, args);
 	}
-	else if (!strcmp(command, "CREATE-ROOM")) {
-		createRoom(fd, user, password, args);
-	}
 	else if (!strcmp(command, "LEAVE-ROOM")) {
 		leaveRoom(fd, user, password, args);
 	}
@@ -481,15 +478,9 @@ IRCServer::processRequest( int fd )
 	else if (!strcmp(command, "GET-USERS-IN-ROOM")) {
 		getUsersInRoom(fd, user, password, args);
 	}
-	else if (!strcmp(command, "LIST-ROOMS")) {
-		listRooms(fd, user, password, args);
-	}
 	else if (!strcmp(command, "GET-ALL-USERS")) {
 		getAllUsers(fd, user, password, args);
 	}
-	else if (!strcmp(command, "CHECK-AUTH")) {
-		checkAuth(fd, user, password, args);
-	}	
 	else {
 		const char * msg =  "UNKNOWN COMMAND\r\n";
 		write(fd, msg, strlen(msg));
@@ -561,26 +552,6 @@ IRCServer::addUser(int fd, char * user, char * password, char * args)
 	}
 	else {
 		const char * msg =  "DENIED\r\n";
-		write(fd, msg, strlen(msg));
-	}
-	return;		
-}
-
-void
-IRCServer::checkAuth(int fd, char * user, char * password, char * args)
-{
-	if(userlist_exists(usersList, user) == 1) {
-		if(checkPassword(user, password) == 1) {
-			const char * msg =  "OK\r\n";
-			write(fd, msg, strlen(msg));
-		}
-		else {
-			const char * msg =  "NO\r\n";
-			write(fd, msg, strlen(msg));
-		}
-	}
-	else {
-		const char * msg =  "NO\r\n";
 		write(fd, msg, strlen(msg));
 	}
 	return;		
