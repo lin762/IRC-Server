@@ -419,6 +419,7 @@ IRCServer::processRequest( int fd )
 	user = strtok (NULL, " ");
 	password = strtok (NULL, " ");
 	args = strtok (NULL, "\n");
+	printf("%s",command);
 
 	if (!strcmp(command, "ADD-USER")) {
 		addUser(fd, user, password, args);
