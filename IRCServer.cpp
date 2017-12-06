@@ -740,7 +740,7 @@ void IRCServer::getMessages(int fd, char * user, char * password, char * args) {
 					if(maxMessages < e->messageCounter) {
 						lastMessageNum = 0;
 					}
-					if(lastMessageNum >= e->messageCounter) {
+					if(lastMessageNum > e->messageCounter) {
 						const char *msg = "NO-NEW-MESSAGES\r\n";
 						write(fd, msg, strlen(msg));
 						return;
