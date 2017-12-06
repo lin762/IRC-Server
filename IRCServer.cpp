@@ -402,7 +402,7 @@ IRCServer::processRequest( int fd )
 	commandLineLength--;
         commandLine[ commandLineLength ] = 0;
 
-	//printf("RECEIVED: %s\n", commandLine);
+	printf("RECEIVED: %s\n", commandLine);
 
 	// printf("The commandLine has the following format:\n");
 	// printf("COMMAND <user> <password> <arguments>. See below.\n");
@@ -419,7 +419,7 @@ IRCServer::processRequest( int fd )
 	user = strtok (NULL, " ");
 	password = strtok (NULL, " ");
 	args = strtok (NULL, "\n");
-	printf("%s",command);
+	
 
 	if (!strcmp(command, "ADD-USER")) {
 		addUser(fd, user, password, args);
