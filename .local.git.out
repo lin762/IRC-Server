@@ -420,3 +420,20 @@ After doing this, you may fix the identity used for this commit with:
  4 files changed, 2 insertions(+)
 [master 1950bd0] Make IRCclient
  2 files changed, 3 insertions(+), 1 deletion(-)
+[master 8756e40] Make IRCclient
+ Committer: Christopher Simon Lin <lin762@pod1-4.cs.purdue.edu>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 3 files changed, 767 insertions(+), 129 deletions(-)
+ create mode 100644 .local.git.out
+ create mode 100644 basiclayouts.pro.user.2ba08eb

@@ -102,6 +102,7 @@
 #define DIALOG_H
 
 #include <QDialog>
+#include "IRCSocket.h"
 
 class QAction;
 class QDialogButtonBox;
@@ -113,6 +114,7 @@ class QMenuBar;
 class QPushButton;
 class QTextEdit;
 class QListWidget;
+class QComboBox;
 
 class Dialog : public QDialog
 {
@@ -147,6 +149,14 @@ private slots:
     void sendAction();
     void newUserAction();
     void timerAction();
+    void createRoomAction();
+    void loginAction();
+    //void enterRoomBridge();
+    void enterRoomAction();
+    void updateRoom();
+    void updateUsersInRoom();
+    void updateMessage();
+    void leaveRoomAction();
 };
 
 
